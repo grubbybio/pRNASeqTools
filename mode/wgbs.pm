@@ -93,10 +93,10 @@ sub run {
             rename $tag."_trimmed.fastq", $tag.".fastq";
           }
           system ("bismark -p ".$thread." -N 1 . ".$tag.".fastq 2>&1");
-          system ("deduplicate_bismark -s --bam ".$tag."_R1_bismark_bt2_se.bam 2>&1");
-          rename $tag."_R1_bismark_bt2_se.deduplicated.bam", $tag.".bam";
+          system ("deduplicate_bismark -s --bam ".$tag."_bismark_bt2.bam 2>&1");
+          rename $tag."_bismark_bt2.deduplicated.bam", $tag.".bam";
           system ("bismark_methylation_extractor --parallel ".$thread." -s --bedGraph --cutoff 4 --cytosine_report --CX --genome_folder . ".$tag.".bam 2>&1");
-          unlink ($tag.".fastq", $tag."_R1_bismark_bt2_se.bam");
+          unlink ($tag.".fastq", $tag."_bismark_bt2.bam");
         }else{
           Function->unzip($files[0], $tag."_R1");
           Function->unzip($files[1], $tag."_R2");

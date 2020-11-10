@@ -208,6 +208,29 @@ sub run {
       print $main::tee "\nFinding DEG...\nFold Change\t$foldchange\tP Value\t$pvalue\n";
 
       system ("Rscript --vanilla ".$prefix."/scripts/DEG.R ".$norm." ".$pvalue." ".$foldchange." ".$prefix." ".$genome." ".$par);
+
+      opendir my $dir, "." or die $!;
+      my @dir = grep {/csv$/} readdir $dir;
+      closedir $dir;
+
+      my %gann = Ref->gann($prefix, $genome);
+      foreach my $csv (@dir){
+        open CSV, "$csv" or die $!;
+    		open TMP, ">tmp" or die $!;
+    		while(my $bb = <CSV>){
+    			chomp $bb;
+    			my @row = split /,/, $bb;
+    			$row[0] =~ s/"//g;
+    			if(exists $gann{$row[0]}){
+    				print TMP "$bb,$gann{$row[0]}\n";
+    			}else{
+    				print TMP "$bb,NA,NA\n";
+    			}
+    		}
+    		close CSV;
+    		close TMP;
+    		rename "tmp", $csv;
+      }
     }
 	}else{
     foreach my $pre (@tags){
@@ -217,6 +240,29 @@ sub run {
     print $main::tee "\nFinding DEG...\nFold Change\t$foldchange\tP Value\t$pvalue\n";
 
     system ("Rscript --vanilla ".$prefix."/scripts/DEG.R ".$norm." ".$pvalue." ".$foldchange." ".$prefix." ".$genome." ".$par);
+
+    opendir my $dir, "." or die $!;
+    my @dir = grep {/csv$/} readdir $dir;
+    closedir $dir;
+
+    my %gann = Ref->gann($prefix, $genome);
+    foreach my $csv (@dir){
+      open CSV, "$csv" or die $!;
+      open TMP, ">tmp" or die $!;
+      while(my $bb = <CSV>){
+        chomp $bb;
+        my @row = split /,/, $bb;
+        $row[0] =~ s/"//g;
+        if(exists $gann{$row[0]}){
+          print TMP "$bb,$gann{$row[0]}\n";
+        }else{
+          print TMP "$bb,NA,NA\n";
+        }
+      }
+      close CSV;
+      close TMP;
+      rename "tmp", $csv;
+    }
     unlink glob "*_?.txt";
   }
 }

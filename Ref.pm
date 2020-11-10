@@ -248,7 +248,7 @@ sub lengthofchrom {
   my ($self, $prefix, $genome, $binsize) = @_;
   my %length;
 
-  open FAI, "$prefix/reference/$genome"."_chr_all.fasta.fai" or die $!;
+  open FAI, $prefix."/reference/".$genome."_chr_all.fasta.fai" or die $!;
   while (my $fai = <FAI>){
     chomp $fai;
     my @row = split /\t/, $fai;
@@ -258,5 +258,35 @@ sub lengthofchrom {
   return %length;
 }
 
+sub gann {
+  my ($self, $prefix, $genome) = @_;
+  my %gann;
+
+  open BIN, $prefix."/reference/".$genome.".BIN" or die $!;
+  open FUN, $prefix."/reference/".$genome.".functional.annotation" or die $!;
+  while(my $aa = <BIN>){
+    chomp $aa;
+    my ($geneID, $bin) = split /\t/, $aa;
+    $gann{$geneID} .= $bin.";";
+  }
+  close BIN;
+  foreach my $gene (keys %gann){
+    chop $gann{$gene};
+  }
+  while(my $bb = <FUN>){
+    chomp $bb;
+    my @fann = split /\t/, $bb;
+    if($fann[0] =~ /(\w+)\.1/){
+      my $geneID = $1;
+      if(exists $gann{$geneID}){
+        $gann{$geneID} .= ",$fann[1],$fann[2],$fann[3],$fann[4]";
+      }else{
+        $gann{$geneID} .= "NA,$fann[1],$fann[2],$fann[3],$fann[4]";
+      }
+    }
+  }
+  close FUN;
+  return %gann
+}
 1;
 __END__

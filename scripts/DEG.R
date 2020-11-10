@@ -9,7 +9,7 @@ as.matrix(table(binref[,2])) -> refbin
 args[-c(1:5)] -> args
 args[c(TRUE, FALSE)] -> genotype
 args[c(FALSE, TRUE)] -> replicates
-message("Samples OK! loading...")
+message("Parameters OK! loading...")
 suppressMessages(library(DESeq2))
 suppressMessages(library(NMF))
 library(RColorBrewer)
@@ -34,10 +34,11 @@ for(q in 2:p){
 }
 rownames(a) <- rownames(eval(parse(text=rownames(b)[1])))
 colnames(a) <- rownames(b)
+apply(a,2,sum)/1000000 -> rtotal
 a[apply(a,1,mean)>=1,] -> a
 DESeqDataSetFromMatrix(countData = a, colData = b, design = ~ genotype) -> dds
 if(norm == "RPM"){
-  sizeFactors(dds) <- apply(a,2,sum)/1000000
+  sizeFactors(dds) <- rtotal
 }
 DESeq(dds) -> dds
 select <- order(rowMeans(counts(dds,normalized=TRUE)),decreasing=TRUE)
@@ -60,7 +61,7 @@ message("Dist completed!")
 dev.off()
 for(j in 2:length(genotype)){
   results(dds,contrast = c("genotype",genotype[j],genotype[1])) -> res
-  cbind(as.data.frame(res),counts(dds,norm = T)) -> out
+  cbind(as.data.frame(res),counts(dds)/rtotal) -> out
   subset(out, pvalue < pvalueoo & log2FoldChange >= log2(foldchangeoo)) -> resup
   subset(out, pvalue < pvalueoo & log2FoldChange <= -log2(foldchangeoo)) -> resdown
   write.csv(out,paste(genotype[j],"vs",genotype[1],"total","csv",sep="."),quote=F)
@@ -95,6 +96,8 @@ for(j in 2:length(genotype)){
       fisher.test(fis)$p.value -> tmp[k,6]
     }
   }
-  colnames(tmp) <- c("GENOME","DETECTED","UP","DOWN","UP P","DOWN P")
+  p.adjust(tmp[,5],"fdr") -> tmp[,7]
+  p.adjust(tmp[,6],"fdr") -> tmp[,8]
+  colnames(tmp) <- c("GENOME","DETECTED","UP","DOWN","UP P","DOWN P","UP FDR","DOWN FDR")
   write.table(tmp,paste(genotype[j],"vs",genotype[1],"total","bin","txt",sep="."),quote=F,sep="\t")
 }

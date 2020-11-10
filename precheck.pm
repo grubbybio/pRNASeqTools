@@ -2,10 +2,13 @@
 package precheck;
 use Modern::Perl;
 
+my $prefix = $1 if($0 =~ /^(.+)\/.+$/);
+
 sub dependencies {
   my ($self) = @_;
 
   print STDERR "\nChecking dependent software...\n";
+
   my $cutadapt = qx(cutadapt --version);
   my $samtools = qx(samtools --version);
   my $bowtie = qx(bowtie --version);
@@ -107,6 +110,7 @@ sub dependencies {
   }else{
     die "Please install UCSC-bedGraphToBigWig!";
   }
+  system("Rscript --vanilla ".$prefix."/scripts/checkPackages.R");
 
   print STDERR "Precheck completed!\n\n";
 
