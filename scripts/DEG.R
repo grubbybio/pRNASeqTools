@@ -2,11 +2,11 @@ options(warn=-1)
 args = commandArgs(trailingOnly = T)
 norm = args[1]
 pvalueoo <- as.numeric(args[2])
-foldchangeoo <- as.numeric(args[3])
-fdroo = 0.05
-read.table(paste(args[4],"/reference/",args[5],".BIN",sep=""), as.is = T, sep="\t") -> binref
+fdroo <- as.numeric(args[3])
+foldchangeoo <- as.numeric(args[4])
+read.table(paste(args[5],"/reference/",args[6],".BIN",sep=""), as.is = T, sep="\t") -> binref
 as.matrix(table(binref[,2])) -> refbin
-args[-c(1:5)] -> args
+args[-c(1:6)] -> args
 args[c(TRUE, FALSE)] -> genotype
 args[c(FALSE, TRUE)] -> replicates
 message("Parameters OK! loading...")
@@ -62,8 +62,13 @@ dev.off()
 for(j in 2:length(genotype)){
   results(dds,contrast = c("genotype",genotype[j],genotype[1])) -> res
   cbind(as.data.frame(res),counts(dds)/rtotal) -> out
-  subset(out, pvalue < pvalueoo & log2FoldChange >= log2(foldchangeoo)) -> resup
-  subset(out, pvalue < pvalueoo & log2FoldChange <= -log2(foldchangeoo)) -> resdown
+  if(fdroo < 1){
+    subset(out, padj < fdroo & log2FoldChange >= log2(foldchangeoo)) -> resup
+    subset(out, padj < fdroo & log2FoldChange <= -log2(foldchangeoo)) -> resdown
+  }else{
+    subset(out, pvalue < pvalueoo & log2FoldChange >= log2(foldchangeoo)) -> resup
+    subset(out, pvalue < pvalueoo & log2FoldChange <= -log2(foldchangeoo)) -> resdown
+  }
   write.csv(out,paste(genotype[j],"vs",genotype[1],"total","csv",sep="."),quote=F)
   write.csv(resup,paste(genotype[j],"vs",genotype[1],"total","hyper","csv",sep="."),quote=F)
   write.csv(resdown,paste(genotype[j],"vs",genotype[1],"total","hypo","csv",sep="."),quote=F)

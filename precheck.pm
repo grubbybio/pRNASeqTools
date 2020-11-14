@@ -26,7 +26,7 @@ sub dependencies {
   my $deeptools = qx(deeptools --version 2>&1);
   my $bedgraphtobigwig = qx(bedGraphToBigWig 2>&1);
 
-  if($cutadapt =~ /^2\./){
+  if($cutadapt =~ /^\d\./){
   	print STDERR "cutadapt version $cutadapt";
   }else{
   	die "Please install cutadapt!\n";

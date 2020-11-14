@@ -46,6 +46,12 @@ option 'pvalue' => (
   default => '0.01',
   documentation => q[Threshold for DEG in P value.],
 );
+option 'fdr' => (
+  is => 'rw',
+  isa => 'Num',
+  default => '1',
+  documentation => q[Threshold for DEG in FDR. Will overwrite P value threshold],
+);
 option 'DESeq2Norm' => (
   is => 'rw',
   isa => 'Str',
@@ -63,6 +69,7 @@ sub run {
   my $prefix = $options{'prefix'};
   my $foldchange = $options{'foldchange'};
   my $pvalue = $options{'pvalue'};
+  my $fdr = $options{'fdr'};
   my $nomapping = $options{'nomapping'};
   my $mappingonly = $options{'mappingonly'};
   my $control = $options{'control'};
@@ -205,9 +212,9 @@ sub run {
     remove_tree "Genome";
     if(!$mappingonly and $#par > 1){
 
-      print $main::tee "\nFinding DEG...\nFold Change\t$foldchange\tP Value\t$pvalue\n";
+      print $main::tee "\nFinding DEG...\nFold Change\t$foldchange\tP Value\t$pvalue\tFDR\t$fdr\n";
 
-      system ("Rscript --vanilla ".$prefix."/scripts/DEG.R ".$norm." ".$pvalue." ".$foldchange." ".$prefix." ".$genome." ".$par);
+      system ("Rscript --vanilla ".$prefix."/scripts/DEG.R ".$norm." ".$pvalue." ".$fdr." ".$foldchange." ".$prefix." ".$genome." ".$par);
 
       opendir my $dir, "." or die $!;
       my @dir = grep {/csv$/} readdir $dir;
@@ -237,9 +244,9 @@ sub run {
       symlink "../".$pre.".txt", $pre.".txt" or die $!;
     }
 
-    print $main::tee "\nFinding DEG...\nFold Change\t$foldchange\tP Value\t$pvalue\n";
+    print $main::tee "\nFinding DEG...\nFold Change\t$foldchange\tP Value\t$pvalue\tFDR\t$fdr\n";
 
-    system ("Rscript --vanilla ".$prefix."/scripts/DEG.R ".$norm." ".$pvalue." ".$foldchange." ".$prefix." ".$genome." ".$par);
+    system ("Rscript --vanilla ".$prefix."/scripts/DEG.R ".$norm." ".$pvalue." ".$fdr." ".$foldchange." ".$prefix." ".$genome." ".$par);
 
     opendir my $dir, "." or die $!;
     my @dir = grep {/csv$/} readdir $dir;

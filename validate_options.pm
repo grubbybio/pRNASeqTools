@@ -28,7 +28,8 @@ sub run {
     }
   }
   die 'Please use appropriate threads!' if(defined $options{'thread'} and $options{'thread'} =~ /[^1-9]/);
-  die 'Please use an appropriate P value!' if(defined $options{'pvalue'} and $options{'pvalue'} > 0.05);
+  die 'Please use an appropriate P value!' if(defined $options{'pvalue'} and $options{'pvalue'} > 1);
+  die 'Please use an appropriate FDR value!' if(defined $options{'fdr'} and $options{'fdr'} > 1);
   die 'Please use an appropriate fold change!' if(defined $options{'foldchange'} and $options{'foldchange'} < 1.5);
   die 'Please use a supported strategy for mapping!' if(defined $options{'mmap'} and $options{'mmap'} =~ /[^ufrn]/);
   die 'Please use an appropriate window size!' if(defined $options{'binsize'} and $options{'binsize'} < 100);
