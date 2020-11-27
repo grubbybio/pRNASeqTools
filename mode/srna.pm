@@ -48,7 +48,7 @@ option 'mapping-only' => (
 option 'norm' => (
   is => 'rw',
   isa => 'Str',
-  default => 'rRNA,total',
+  default => 'rRNA,total,canonical',
   documentation => q[Method for normalization, seperated by comma. Allowed: rRNA, total, spike_in.],
 );
 option 'binsize' => (
@@ -209,14 +209,17 @@ sub run {
 
       print $main::tee "\nLength distribution summary done!\nCounting start...\n";
 
-      open NF, "$tag.nf" or die $!;
+      open NF, $tag.".nf" or die $!;
       my %normhash;
       while (my $line = <NF>){
         chomp $line;
         my ($mnorm, $rc) = split /\t/, $line;
         $normhash{$mnorm} = $rc;
       }
+      $normhash{"canonical"} = $normhash{"total"} - $normhash{"rRNA"} - $normhash{"SSU"};
       close NF;
+      open NF, ">>".$tag.".nf" or die $!;
+      print NF "canonical\t$normhash{canonical}\n";
       foreach my $mnorm (@norms){
         if(exists $normhash{$mnorm}){
           mode::srna->count($mnorm, $normhash{$mnorm}, $prefix, $genome, $binsize, $tag);
@@ -354,7 +357,6 @@ sub count {
   close MIO;
   %count = ();
   %mirna = ();
-
   opendir my $dir, "." or die $!;
   my @dir = grep {/$tag.*[0-9]\.bed/} readdir $dir;
   close $dir;

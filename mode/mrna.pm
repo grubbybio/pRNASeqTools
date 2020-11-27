@@ -177,7 +177,7 @@ sub run {
   		}
   		rename "Aligned.sortedByCoord.out.bam", $tag.".bam";
   		cat 'Log.final.out', \*STDOUT;
-      Function->countBAM($tag, $thread, $seqStrategy, $prefix, $genome);
+      mode::mrna->countBAM($tag, $thread, $seqStrategy, $prefix, $genome);
     }
     unlink ("Log.out", "Log.progress.out", "Log.final.out", "SJ.out.tab", $genome."_genes.gtf");
     unlink glob ("total.count*");
@@ -251,6 +251,44 @@ sub run {
       unlink glob "*_?.txt";
     }
   }
+}
+
+sub countBAM {
+	my ($self, $tag, $thread, $seqStrategy, $prefix, $genome) = @_;
+
+	system ("samtools index ".$tag.".bam");
+	system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --filterRNAstrand forward --normalizeUsing RPKM -o ".$tag.".forward.bw");
+	system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --filterRNAstrand reverse --normalizeUsing RPKM -o ".$tag.".reverse.bw");
+
+	print $main::tee "\nStart counting...\n";
+
+	my %count = ();
+	my $countSum = 0;
+	if($seqStrategy eq "single"){
+		system ("featureCounts -T ".$thread." -C -O -G ".$prefix."/reference/".$genome."_chr_all.fasta -s 0 -a ".$genome."_genes.gtf -o total.count ".$tag.".bam 2>&1");
+	}elsif($seqStrategy eq "paired"){
+		system ("featureCounts -T ".$thread." -p -B -C -O -G ".$prefix."/reference/".$genome."_chr_all.fasta -s 0 -a ".$genome."_genes.gtf -o total.count ".$tag.".bam 2>&1");
+	}
+	open COUNT, "<total.count" or die $!;
+	my $header = <COUNT>;
+	$header = <COUNT>;
+	while(my $row = <COUNT>){
+		chomp $row;
+		my @cols = split /\t/, $row;
+		$count{$cols[0]}{"exon"} = $cols[6];
+		$count{$cols[0]}{"length"} = $cols[5];
+		$countSum += $cols[6];
+	}
+	close COUNT;
+
+	print $main::tee "\nRead Count:".$countSum."\n";
+
+	open OUT, ">".$tag.".txt" or die $!;
+	print OUT "Gene\tCount\tLength\n";
+	foreach my $name (sort keys %count){
+		print OUT "$name\t$count{$name}{exon}\t$count{$name}{length}\n";
+	}
+	close OUT;
 }
 
 1;
