@@ -15,13 +15,13 @@ command_short_description q[Analysis for TS-CLIP-seq];
 command_long_description q[Analysis for TS-CLIP-seq];
 command_usage q[pRNASeqTools ts [OPTIONS] --control [CONTROL]=[file1]+[file2] ... --treatment [TREATMENT]=[file1]+[file2] ... ];
 
-option 'nomapping' => (
+option 'no-mapping' => (
   is => 'rw',
   isa => 'Bool',
   default => 0,
   documentation => q[Just perform the statistic analysis.],
 );
-option 'mappingonly' => (
+option 'mapping-only' => (
   is => 'rw',
   isa => 'Bool',
   default => 0,

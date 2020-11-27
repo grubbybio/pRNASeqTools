@@ -14,7 +14,7 @@ command_short_description q[Analysis for phasiRNA using small RNA-seq];
 command_long_description q[Analysis for phasiRNA using small RNA-seq];
 command_usage q[pRNASeqTools phasi [OPTIONS] --control [CONTROL]=[file1]+[file2] ... --treatment [TREATMENT]=[file1]+[file2] ... ];
 
-option 'nomapping' => (
+option 'no-mapping' => (
   is => 'rw',
   isa => 'Bool',
   default => 0,

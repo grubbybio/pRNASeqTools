@@ -39,8 +39,6 @@ sub run {
   die 'Please specify an fasta file for mask!' if(defined $options{'mask'} and $options{'mask'} !~ /fasta$|fa$/);
   die 'Please select the correct style!' if(defined $options{'style'} and $options{'style'} !~ /histone|factor|tss/);
   die 'Cannot find the target list!' if(defined $options{'targets'} and $options{'targets'} ne "all" and !-e $options{'targets'});
-  die 'Please use a suppported mode!' if(defined $options{'mode'} and $options{'mode'} ne 'mrna' and $options{'mode'} ne 'srna' and $options{'mode'} ne 'bulk' and $options{'mode'} ne 'sc');
-  return %options;
 }
 
 1;

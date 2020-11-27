@@ -15,13 +15,13 @@ command_short_description q[Analysis for WGBS sequencing];
 command_long_description q[Analysis for WGBS sequencing];
 command_usage q[pRNASeqTools wgbs [OPTIONS] --control [CONTROL]=[file1]+[file2] ... ];
 
-option 'nomapping' => (
+option 'no-mapping' => (
   is => 'rw',
   isa => 'Bool',
   default => 0,
   documentation => q[Just perform the ribo-seq analysis],
 );
-option 'mappingonly' => (
+option 'mapping-only' => (
   is => 'rw',
   isa => 'Bool',
   default => 0,

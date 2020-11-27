@@ -21,7 +21,7 @@ option 'mmap' => (
   default => 'u',
   documentation => q[method for assigning multiple mapped reads. Allowed: u, n, f, r],
 );
-option 'nomapping' => (
+option 'no-mapping' => (
   is => 'rw',
   isa => 'Bool',
   default => 0,
@@ -39,7 +39,7 @@ option 'pvalue' => (
   default => '0.01',
   documentation => q[Threshold for DEG in P value. Default: 0.01],
 );
-option 'mappingonly' => (
+option 'mapping-only' => (
   is => 'rw',
   isa => 'Bool',
   default => 0,

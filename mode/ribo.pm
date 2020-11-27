@@ -14,13 +14,13 @@ command_short_description q[Analysis for Ribo-seq];
 command_long_description q[Analysis for Ribo-seq];
 command_usage q[pRNASeqTools ribo [OPTIONS] --control [CONTROL]=[file1]+[file2] ... --treatment [TREATMENT1]=[file1]+[file2] ... --treatment [TREATMENT2]=[file1]+[file2] ... ];
 
-option 'nomapping' => (
+option 'no-mapping' => (
   is => 'rw',
   isa => 'Bool',
   default => 0,
   documentation => q[Just perform the ribo-seq analysis],
 );
-option 'mappingonly' => (
+option 'mapping-only' => (
   is => 'rw',
   isa => 'Bool',
   default => 0,
@@ -84,7 +84,7 @@ sub run {
       system ("ShortStack --outdir ShortStack_".$tag." --align_only --bowtie_m 10 --ranmax 10 --mmap ".$mmap." --mismatches 0 --bowtie_cores ".$thread." --nohp --readfile ".$tag.".fastq --genomefile ".$genome.".fa 2>&1");
 
       print $main::tee "\nAlignment Completed!\n";
-      
+
       system ("samtools view -h ShortStack_".$tag."/".$tag."_trimmed.bam | awk '{if(\$10!=\"*\" && \$3!=\"*\") print}' > ".$tag.".sam");
       system ("samtools view -Sb --thread ".$thread." ".$tag.".sam > ".$tag.".bam");
       system ("samtools index ".$tag.".bam");
