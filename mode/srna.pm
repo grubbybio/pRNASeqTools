@@ -48,8 +48,8 @@ option 'mapping-only' => (
 option 'norm' => (
   is => 'rw',
   isa => 'Str',
-  default => 'rRNA,total,canonical',
-  documentation => q[Method for normalization, seperated by comma. Allowed: rRNA, total, spike_in.],
+  default => 'rRNA,total',
+  documentation => q[Method for normalization, seperated by comma. Default: rRNA, total.],
 );
 option 'binsize' => (
   is => 'rw',
@@ -87,8 +87,8 @@ sub run {
   my $mmap = $options{'mmap'};
   my $control = $options{'control'};
   my $treatment = $options{'treatment'};
-  my $nomapping = $options{'nomapping'};
-  my $mappingonly = $options{'mappingonly'};
+  my $nomapping = $options{'no-mapping'};
+  my $mappingonly = $options{'mapping-only'};
   my $foldchange = $options{'foldchange'};
   my $pvalue = $options{'pvalue'};
   my $binsize = $options{'binsize'};
@@ -216,10 +216,7 @@ sub run {
         my ($mnorm, $rc) = split /\t/, $line;
         $normhash{$mnorm} = $rc;
       }
-      $normhash{"canonical"} = $normhash{"total"} - $normhash{"rRNA"} - $normhash{"SSU"};
       close NF;
-      open NF, ">>".$tag.".nf" or die $!;
-      print NF "canonical\t$normhash{canonical}\n";
       foreach my $mnorm (@norms){
         if(exists $normhash{$mnorm}){
           mode::srna->count($mnorm, $normhash{$mnorm}, $prefix, $genome, $binsize, $tag);
