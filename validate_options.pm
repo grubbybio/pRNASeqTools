@@ -36,6 +36,7 @@ sub run {
   die 'Please specify an appropriate length of preferred small RNAs!' if(defined $options{'length'} and ($options{'length'} < 18 || $options{'length'} > 42));
   die 'Parameter conflict: nomapping and mappingonly!' if(defined $options{'no-mapping'} and defined $options{'mapping-only'} and $options{'no-mapping'} + $options{'mapping-only'} == 2);
   die 'Method not supported!' if(defined $options{'DESeq2Norm'} and $options{'DESeq2Norm'} ne 'DESeq2' and $options{'DESeq2Norm'} ne 'RPM');
+  die 'Please specify an appropriate sequencing strategy!' if(defined $options{'seqStrategy'} and $options{'seqStrategy'} ne 'single' and $options{'seqStrategy'} ne 'paired');
   die 'Please specify an fasta file for mask!' if(defined $options{'mask'} and $options{'mask'} !~ /fasta$|fa$/);
   die 'Please select the correct style!' if(defined $options{'style'} and $options{'style'} !~ /histone|factor|tss/);
   die 'Cannot find the target list!' if(defined $options{'targets'} and $options{'targets'} ne "all" and !-e $options{'targets'});

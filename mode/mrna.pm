@@ -126,6 +126,7 @@ sub run {
   		print $main::tee "\nMapping $tag...\n";
 
   		if($file !~ /,/){
+        $seqStrategy = "single";
 			  my @files = Function->SRR($file, $thread);
         if($#files == 0){
       	  Function->unzip($files[0], $tag);
@@ -141,12 +142,13 @@ sub run {
     			system ("STAR --genomeDir Genome --alignIntronMax 5000 --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag.".fastq 2>&1");
     			unlink ($tag.".fastq");
         }else{
+          $seqStrategy = "paired";
           Function->unzip($files[0], $tag."_R1");
           Function->unzip($files[1], $tag."_R2");
           if(defined $adaptor){
             system ("cutadapt -j ".$thread." -m 20 --trim-n -a ".$adaptor." -A ".$adaptor." -o ".$tag."_R1_trimmed.fastq -p ".$tag."_R2_trimmed.fastq ".$tag."_R1.fastq ".$tag."_R2.fastq 2>&1");
             rename $tag."_R1_trimmed.fastq", $tag."_R1.fastq";
-        rename $tag."_R2_trimmed.fastq", $tag."_R2.fastq";
+            rename $tag."_R2_trimmed.fastq", $tag."_R2.fastq";
           }
           if(defined $mask){
             system ("bowtie -v 0 -a --un tmp.fastq -p ".$thread." -t mask -1 ".$tag."_R1.fastq -2 ".$tag."_R2.fastq ".$tag.".mask.out 2>&1");
@@ -159,6 +161,7 @@ sub run {
         }
   		}else{
        	my ($file1, $file2) = split /,/, $file;
+        $seqStrategy = "paired";
 				Function->unzip($file1, $tag."_R1");
 				Function->unzip($file2, $tag."_R2");
   		  if(defined $adaptor){
