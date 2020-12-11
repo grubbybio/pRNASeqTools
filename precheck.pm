@@ -18,7 +18,7 @@ sub dependencies {
   my $bedtools = qx(bedtools --version);
   my $R = qx(R --version);
   my $star = qx(STAR --version);
-  my $clipseqtools = qx(clipper);
+  my $clipper = qx(clipper -h);
   my $fasterq_dump = qx(fasterq-dump -h);
   my $gffread = qx(gffread --version 2>&1);
   my $chip = qx(configureHomer.pl -list 2>&1|grep "+");
@@ -75,8 +75,8 @@ sub dependencies {
   }else{
   	die "Please install STAR!";
   }
-  if($clipseqtools =~ /^Usage:/){
-    print STDERR "CLIPper Installed\n";
+  if($clipper =~ /^Usage/){
+    print STDERR "CLIPper installed\n";
   }else{
     die "Please install CLIPper";
   }

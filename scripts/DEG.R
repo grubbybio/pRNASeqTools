@@ -61,7 +61,7 @@ message("Dist completed!")
 dev.off()
 for(j in 2:length(genotype)){
   results(dds,contrast = c("genotype",genotype[j],genotype[1])) -> res
-  cbind(as.data.frame(res),counts(dds)/rtotal) -> out
+  cbind(as.data.frame(res),t(t(counts(dds))/rtotal)) -> out
   if(fdroo < 1){
     subset(out, padj < fdroo & log2FoldChange >= log2(foldchangeoo)) -> resup
     subset(out, padj < fdroo & log2FoldChange <= -log2(foldchangeoo)) -> resdown

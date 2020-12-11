@@ -112,7 +112,6 @@ sub run {
   my $par = join " ", @par;
 
   if(!$nomapping){
-
     Ref->splitgff($prefix, $genome, $promoterLength);
     if(defined $mask){
       if($mask =~ /^~\/(.+)/){
@@ -131,7 +130,6 @@ sub run {
 
       $file = Function->SRR($file, $thread);
       Function->unzip($file, $tag);
-
       if($mode eq 'sc'){
 
         print $main::tee "\nTrimming $tag...\n";
@@ -140,7 +138,6 @@ sub run {
         if(defined $adaptor){
           system ("cutadapt -j ".$thread." -m 18 -M 42 --discard-untrimmed --trim-n -a ".$adaptor." -o ".$tag."_trimmed.fastq ".$tag.".fq 2>&1");
         }
-
         open DUP, "<".$tag."_trimmed.fastq" or die $!;
         my (%dedup, $outSeq, @seqNames, @outSeqNames);
         while (my $dup = <DUP>){

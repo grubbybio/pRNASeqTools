@@ -241,7 +241,7 @@ sub run {
         if(exists $gann{$row[0]}){
           print TMP "$bb,$gann{$row[0]}\n";
         }else{
-          print TMP "$bb,NA,NA\n";
+          print TMP "$bb,Mapman,type,short,description,long\n";
         }
       }
       close CSV;

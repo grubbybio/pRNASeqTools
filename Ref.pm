@@ -276,7 +276,7 @@ sub gann {
   while(my $bb = <FUN>){
     chomp $bb;
     my @fann = split /\t/, $bb;
-    if($fann[0] =~ /(\w+)\.1/){
+    if($fann[0] =~ /(\w+)\.1$/){
       my $geneID = $1;
       if(exists $gann{$geneID}){
         $gann{$geneID} .= ",$fann[1],$fann[2],$fann[3],$fann[4]";
