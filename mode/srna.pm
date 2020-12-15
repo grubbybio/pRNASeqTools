@@ -343,7 +343,7 @@ sub count {
     $mirna{$miseq}{"count"} += $count{$row[8]};
   }
   close MI;
-  open MIO, ">$tag".".miRNA.annotated.count" or die $!;
+  open MIO, ">".$tag.".miRNA.annotated.count" or die $!;
   foreach $miseq (sort keys %mirna){
     chop $mirna{$miseq}{"name"};
     print MIO "$mirna{$miseq}{name}\t$mirna{$miseq}{count}\n";

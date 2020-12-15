@@ -186,11 +186,8 @@ sub run {
     unlink glob ("total.count*");
     unlink glob ("mask*") if(defined $mask);
     remove_tree "Genome";
-
     if($de){
-
       print $main::tee "\nFinding DEG...\nFold Change\t$foldchange\tP Value\t$pvalue\tFDR\t$fdr\n";
-
       system ("Rscript --vanilla ".$prefix."/scripts/DEG.R ".$norm." ".$pvalue." ".$fdr." ".$foldchange." ".$prefix." ".$genome." ".$par);
       opendir my $dir, "." or die $!;
       my @dir = grep {/csv$/} readdir $dir;
@@ -218,14 +215,18 @@ sub run {
     foreach my $pre (@tags){
       if($count){
         symlink "../".$pre.".bam", $pre.".bam" or die $!;
-        Function->countBAM($pre, $thread, $seqStrategy, $prefix, $genome);
+        if($total){
+          system ("gffread -T -o ".$genome."_genes.gtf -g ".$prefix."/reference/".$genome."_chr_all.fasta ".$prefix."/reference/".$genome."_genes.gff");
+        }else{
+          system ("gffread -T -C -o ".$genome."_genes.gtf -g ".$prefix."/reference/".$genome."_chr_all.fasta ".$prefix."/reference/".$genome."_genes.gff");
+        }
+        mode::mrna->countBAM($pre, $thread, $seqStrategy, $prefix, $genome);
+        unlink $genome."_genes.gtf";
       }else{
         symlink "../".$pre.".txt", $pre.".txt" or die $!;
       }
     }
-
     print $main::tee "\nFinding DEG...\nFold Change\t$foldchange\tP Value\t$pvalue\tFDR\t$fdr\n";
-
     system ("Rscript --vanilla ".$prefix."/scripts/DEG.R ".$norm." ".$pvalue." ".$fdr." ".$foldchange." ".$prefix." ".$genome." ".$par);
     opendir my $dir, "." or die $!;
     my @dir = grep {/csv$/} readdir $dir;

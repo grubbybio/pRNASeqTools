@@ -40,6 +40,7 @@ sub run {
   die 'Please specify an fasta file for mask!' if(defined $options{'mask'} and $options{'mask'} !~ /fasta$|fa$/);
   die 'Please select the correct style!' if(defined $options{'style'} and $options{'style'} !~ /histone|factor|tss/);
   die 'Cannot find the target list!' if(defined $options{'targets'} and $options{'targets'} ne "all" and !-e $options{'targets'});
+  die "Please provide the library type when input files are in the bam format!" if($options{'mode'} == 3 and !defined $options{'seqStrategy'});
   return %options;
 }
 

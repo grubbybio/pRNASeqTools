@@ -262,8 +262,8 @@ sub gann {
   my ($self, $prefix, $genome) = @_;
   my %gann;
 
-  open BIN, $prefix."/reference/".$genome.".BIN" or die $!;
-  open FUN, $prefix."/reference/".$genome.".functional.annotation" or die $!;
+  open BIN, $prefix."/reference/".$genome.".BIN";
+  open FUN, $prefix."/reference/".$genome.".functional.annotation";
   while(my $aa = <BIN>){
     chomp $aa;
     my ($geneID, $bin) = split /\t/, $aa;
