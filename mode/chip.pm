@@ -71,8 +71,8 @@ sub run {
   my $prefix = $options{'prefix'};
   my $foldchange = $options{'foldchange'};
   my $qvalue = $options{'qvalue'};
-  my $nomapping = $options{'nomapping'};
-  my $mappingonly = $options{'mappingonly'};
+  my $nomapping = $options{'no-mapping'};
+  my $mappingonly = $options{'mapping-only'};
   my $input = $options{'control'};
   my $ip = $options{'treatment'};
   my $igg = $options{'igg'};

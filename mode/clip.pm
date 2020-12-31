@@ -50,8 +50,8 @@ sub run {
   my $prefix = $options{'prefix'};
   my $control = $options{'control'};
   my $treatment = $options{'treatment'};
-  my $nomapping = $options{'nomapping'};
-  my $mappingonly = $options{'mappingonly'};
+  my $nomapping = $options{'no-mapping'};
+  my $mappingonly = $options{'mapping-only'};
   my $foldchange = $options{'foldchange'};
   my $pvalue = $options{'pvalue'};
 

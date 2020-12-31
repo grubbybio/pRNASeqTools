@@ -41,8 +41,8 @@ sub run {
   my $genome = $options{'genome'};
   my $adaptor = $options{'adaptor'};
   my $prefix = $options{'prefix'};
-  my $nomapping = $options{'nomapping'};
-  my $mappingonly = $options{'mappingonly'};
+  my $nomapping = $options{'no-mapping'};
+  my $mappingonly = $options{'mapping-only'};
   my $control = $options{'control'};
   my $treatment = $options{'treatment'};
   my $mmap = $options{'mmap'};

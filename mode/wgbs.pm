@@ -47,8 +47,8 @@ sub run {
   my $genome = $options{'genome'};
   my $adaptor = $options{'adaptor'};
   my $prefix = $options{'prefix'};
-  my $nomapping = $options{'nomapping'};
-  my $mappingonly = $options{'mappingonly'};
+  my $nomapping = $options{'no-mapping'};
+  my $mappingonly = $options{'mapping-only'};
   my $control = $options{'control'};
   my $treatment = $options{'treatment'};
   my $ns = $options{'ns'};
@@ -69,9 +69,7 @@ sub run {
   my $par = join " ", @par;
 
   if(!$nomapping){
-
     print $main::tee "\nBuilding indices...\n";
-
     symlink $prefix."/reference/".$genome."_chr_all.fasta", $genome.".fasta";
     system ("bismark_genome_preparation . 2>&1");
 

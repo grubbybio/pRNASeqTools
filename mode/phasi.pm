@@ -62,8 +62,8 @@ sub run {
   my $mmap = $options{'mmap'};
   my $control = $options{'control'};
   my $treatment = $options{'treatment'};
-  my $nomapping = $options{'nomapping'};
-  my $mappingonly = $options{'mappingonly'};
+  my $nomapping = $options{'no-mapping'};
+  my $mappingonly = $options{'mapping-only'};
   my $binsize = $options{'binsize'};
   my $norm = $options{'norm'};
   my @norms = split /,/, $norm;

@@ -70,8 +70,8 @@ for(j in 2:length(genotype)){
     subset(out, pvalue < pvalueoo & log2FoldChange <= -log2(foldchangeoo)) -> resdown
   }
   write.csv(out,paste(genotype[j],"vs",genotype[1],"total","csv",sep="."),quote=F)
-  write.csv(resup,paste(genotype[j],"vs",genotype[1],"total","hyper","csv",sep="."),quote=F)
-  write.csv(resdown,paste(genotype[j],"vs",genotype[1],"total","hypo","csv",sep="."),quote=F)
+  write.csv(resup,paste(genotype[j],"vs",genotype[1],"total","upregulated","csv",sep="."),quote=F)
+  write.csv(resdown,paste(genotype[j],"vs",genotype[1],"total","downregulated","csv",sep="."),quote=F)
   binref[binref[,1] %in% rownames(res),2] -> tmp1
   as.matrix(table(tmp1)) -> tmp1
   binref[binref[,1] %in% rownames(resup),2] -> tmp2

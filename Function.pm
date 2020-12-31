@@ -12,7 +12,7 @@ sub SRR { #download SRA files
 
   	print $main::tee "Downloading...\n";
 
-  	system ("fasterq-dump --threads ".$thread." --split-3 ".$srr);
+  	system ("fasterq-dump -p --threads ".$thread." --split-3 ".$srr);
   	if(-e $srr."_1.fastq"){
 			unlink $srr.".fastq" if (-e $srr.".fastq");
   		return ($srr."_1.fastq", $srr."_2.fastq");
