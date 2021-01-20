@@ -279,9 +279,9 @@ sub gann {
     if($fann[0] =~ /(\w+)\.1$/){
       my $geneID = $1;
       if(exists $gann{$geneID}){
-        $gann{$geneID} .= ",$fann[1],$fann[2],$fann[3],$fann[4]";
+        $gann{$geneID} .= ",\"$fann[1]\",\"$fann[2]\",\"$fann[3]\",\"$fann[4]\"";
       }else{
-        $gann{$geneID} .= "NA,$fann[1],$fann[2],$fann[3],$fann[4]";
+        $gann{$geneID} .= "NA,\"$fann[1]\",\"$fann[2]\",\"$fann[3]\",\"$fann[4]\"";
       }
     }
   }

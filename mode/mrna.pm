@@ -113,7 +113,7 @@ sub run {
 
     remove_tree "Genome" if(-e "Genome");
     make_path "Genome";
-    system ("STAR --runThreadN ".$thread." --genomeDir Genome --runMode genomeGenerate --genomeFastaFiles ".$prefix."/reference/".$genome."_chr_all.fasta --sjdbGTFfile ".$prefix."/reference/".$genome."_genes.gff --sjdbGTFtagExonParentTranscript Parent --sjdbGTFtagExonParentGene ID --limitGenomeGenerateRAM 64000000000");
+    system ("STAR --runThreadN ".$thread." --genomeDir Genome --runMode genomeGenerate --genomeSAindexNbases 12 --genomeFastaFiles ".$prefix."/reference/".$genome."_chr_all.fasta --sjdbGTFfile ".$prefix."/reference/".$genome."_genes.gff --sjdbGTFtagExonParentTranscript Parent --sjdbGTFtagExonParentGene ID --limitGenomeGenerateRAM 64000000000");
     if($total){
       system ("gffread -T -o ".$genome."_genes.gtf -g ".$prefix."/reference/".$genome."_chr_all.fasta ".$prefix."/reference/".$genome."_genes.gff");
     }else{
@@ -203,7 +203,7 @@ sub run {
     			if(exists $gann{$row[0]}){
     				print TMP "$bb,$gann{$row[0]}\n";
     			}else{
-    				print TMP "$bb,NA,NA\n";
+    				print TMP "$bb,Mapman,type,short,description,long\n";
     			}
     		}
     		close CSV;
