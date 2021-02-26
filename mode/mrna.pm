@@ -261,8 +261,8 @@ sub countBAM {
 	my ($self, $tag, $thread, $seqStrategy, $prefix, $genome) = @_;
 
 	system ("samtools index ".$tag.".bam");
-	system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --filterRNAstrand forward --normalizeUsing RPKM -o ".$tag.".forward.bw");
-	system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --filterRNAstrand reverse --normalizeUsing RPKM -o ".$tag.".reverse.bw");
+	system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --filterRNAstrand forward --normalizeUsing CPM -o ".$tag.".forward.bw");
+	system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --filterRNAstrand reverse --normalizeUsing CPM -o ".$tag.".reverse.bw");
 
 	print $main::tee "\nStart counting...\n";
 

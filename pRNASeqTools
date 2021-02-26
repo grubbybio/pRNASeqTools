@@ -5,6 +5,7 @@ BEGIN{
   push @INC, $ENV{"HOME"}."/miniconda3/lib/site_perl/5.26.2";
   push @INC, $ENV{"HOME"}."/miniconda3/lib/site_perl/5.26.2/darwin-thread-multi-2level";
 }
+
 use Modern::Perl;
 use MooseX::App;
 use mode;
@@ -14,11 +15,8 @@ use IO::Tee;
 our $time = time;
 my $localtime = localtime;
 open STDOUT, '>','log_'.$time.'.txt' or die $!;
-
 our $tee = IO::Tee->new(\*STDOUT, \*STDERR);
-
 print $tee "\npRNASeqTools\nVersion 0.8\tLast update: 12/04/2019\nCommand: @ARGV\nStart: $localtime\n##########\n";
-
 precheck->dependencies();
 mode->new_with_command->run();
 
@@ -31,9 +29,7 @@ END{
     unlink "log_".$time.".txt";
   }else{
     $localtime = localtime;
-
     print $tee "\nMission Completed!\nEnd: $localtime\n";
-
     close STDOUT;
   }
 }

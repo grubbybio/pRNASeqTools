@@ -62,34 +62,27 @@ sub unzip { #seq file format check and unzip
   my ($self, $file, $tag) = @_;
   if(-e $file){
     if($file =~ /bz2$/){
-
       print $main::tee "Decompressing...\n";
-
       system ("bzip2 -dc ".$file." > ".$tag.".fastq");
     }elsif($file =~ /gz$/){
-
       print $main::tee "Decompressing...\n";
-
       system ("gzip -dc ".$file." > ".$tag.".fastq");
+    }elsif($file =~ /gtz$/){
+      print $main::tee "Decompressing...\n";
+      system ("gtz -dc ".$file." > ".$tag.".fastq");
     }elsif($file =~ /fastq$/ or $file =~ /fq$/){
       if ($file ne $tag.".fastq"){
-
         print $main::tee "Renaming...\n";
-
         system ("cp ".$file." ".$tag.".fastq");
         unlink $file if($file =~ /^SRR/);
       }else{
-
         print $main::tee "Backing up...\n";
-
         system ("cp ".$file." ".$tag.".fastq.bak");
       }
     }else{
 			die "Please provide the seq file in correct formats!"
 		}
-
     print $main::tee "Completed!\n";
-
   }else{
     die "Please provide the correct seq file!";
   }

@@ -153,11 +153,8 @@ sub run {
       system ("samtools sort -o ".$tag.".sorted.bam ".$tag.".bam");
       system ("samtools index ".$tag.".sorted.bam");
       unlink $tag.".sam", $tag.".bam";
-      system ("bamCoverage -b ".$tag.".sorted.bam -bs 5 -p ".$thread." --ignoreDuplicates --filterRNAstrand forward --normalizeUsing RPKM -o ".$tag.".forward.bw");
-      system ("bamCoverage -b ".$tag.".sorted.bam -bs 5 -p ".$thread." --ignoreDuplicates --filterRNAstrand reverse --normalizeUsing RPKM -o ".$tag.".reverse.bw");
-
+      system ("bamCoverage -b ".$tag.".sorted.bam -bs 5 -p ".$thread." --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
   		print $main::tee "\nMapping completed!\n";
-
       system ("makeTagDirectory ".$tag." ".$tag.".sorted.bam -tbp 1 -genome ".$genome."_chr_all.fasta 2>&1");
     }
     unlink (glob ($genome."_chr_all*"), "igv.log");

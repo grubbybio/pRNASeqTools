@@ -4,8 +4,7 @@ library(betareg)
 library(RColorBrewer)
 args = commandArgs(trailingOnly = T)
 thread = as.numeric(args[1])
-binsize = as.numeric(args[2])
-args[-c(1:2)] -> args
+args[-1] -> args
 args[c(TRUE,FALSE)] -> genotype
 args[c(FALSE,TRUE)] -> replicates
 p <- sum(as.numeric(replicates))
@@ -21,19 +20,13 @@ for (n in 1:length(genotype)){
 colnames(group) <-"Type"
 diff <- c(0.4,0.2,0.1)
 context <- c("CG","CHG","CHH")
-files <- paste(rownames(group),"CX_report","txt",sep=".")
+files <- paste(rownames(group),"CX_report","txt","gz",sep=".")
 message("Loading...")
 for(i in 1:p){
   assign(rownames(group)[i], readBismark(files[i]))
 }
 cmd <- paste(paste(rownames(group),'=',rownames(group),sep=""),collapse = ',')
 methylationDataList <- eval(parse(text=paste("GRangesList(",cmd,")",sep="")))
-pdf("MethylCProfile.pdf",28,4)
-for(i in 1:p){
-  message(paste("Plotting", rownames(group)[i], "...", sep=" "))
-  plotMethylationProfileFromData(methylationDataList[[i]], conditionsNames = rownames(group)[i], windowSize = 10000, autoscale = FALSE, context = context, labels = LETTERS)
-}
-dev.off()
 control = which(group[,1]==genotype[1])
 controlList = methylationDataList[[control[1]]]
 for(k in 2:length(control)){
@@ -49,7 +42,7 @@ for(j in 2:length(genotype)){
   }
   for(l in 1:3){
     message(paste("Calculating",context[l],"...",sep=" "))
-    DMRsReplicatesRegions <- computeDMRsReplicates(compareList, condition = condition, context = context[l], method = "bins", minProportionDifference = diff[l], binSize = binsize, cores = thread)
+    DMRsReplicatesRegions <- computeDMRsReplicates(compareList, condition = condition, context = context[l], method = "neighbourhood", minProportionDifference = diff[l], cores = thread)
     write.csv(DMRsReplicatesRegions, paste(genotype[j],'vs',genotype[1],context[l],'csv',sep="."), quote = FALSE)
   }
 }

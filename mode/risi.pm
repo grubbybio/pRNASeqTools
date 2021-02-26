@@ -13,7 +13,7 @@ use Cwd 'abs_path';
 
 command_short_description q[Analysis for risiRNA];
 command_long_description q[Analysis for risiRNA];
-command_usage q[pRNASeqTools srna [OPTIONS] --control [CONTROL]=[file1]+[file2] ... --treatment [TREATMENT]=[file1]+[file2] ... ];
+command_usage q[pRNASeqTools risi [OPTIONS] --control [CONTROL]=[file1]+[file2] ... --treatment [TREATMENT]=[file1]+[file2] ... ];
 
 option 'mmap' => (
   is => 'rw',
