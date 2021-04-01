@@ -99,7 +99,7 @@ sub run {
           Function->unzip($files[0], $tag."_R1");
           Function->unzip($files[1], $tag."_R2");
           if(defined $adaptor){
-            system ("cutadapt -j ".$thread." -m 20 --trim-n -a ".$adaptor." -A ".$adaptor."-o ".$tag."_R1_trimmed.fastq -p ".$tag."_R2_trimmed.fastq ".$tag."_R1.fastq ".$tag."_R2.fastq 2>&1");
+            system ("cutadapt -j ".$thread." -m 20 --trim-n -a ".$adaptor." -A ".$adaptor." -o ".$tag."_R1_trimmed.fastq -p ".$tag."_R2_trimmed.fastq ".$tag."_R1.fastq ".$tag."_R2.fastq 2>&1");
             rename $tag."_R1_trimmed.fastq", $tag."_R1.fastq";
             rename $tag."_R2_trimmed.fastq", $tag."_R2.fastq";
           }
@@ -114,7 +114,7 @@ sub run {
         Function->unzip($file1, $tag."_R1");
         Function->unzip($file2, $tag."_R2");
         if(defined $adaptor){
-          system ("cutadapt -j ".$thread." -m 20 --trim-n -a ".$adaptor." -A ".$adaptor."-o ".$tag."_R1_trimmed.fastq -p ".$tag."_R2_trimmed.fastq ".$tag."_R1.fastq ".$tag."_R2.fastq 2>&1");
+          system ("cutadapt -j ".$thread." -m 20 --trim-n -a ".$adaptor." -A ".$adaptor." -o ".$tag."_R1_trimmed.fastq -p ".$tag."_R2_trimmed.fastq ".$tag."_R1.fastq ".$tag."_R2.fastq 2>&1");
           rename $tag."_R1_trimmed.fastq", $tag."_R1.fastq";
           rename $tag."_R2_trimmed.fastq", $tag."_R2.fastq";
         }

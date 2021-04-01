@@ -28,9 +28,9 @@ sub gff {
         $index{$chr}{$ind-1}{$id}{end} = $row[4];
       }
     }elsif($row[8] =~ /Parent=$id/){
-        $index{$chr}{$ind}{$id}{exon} .= $row[3]."\t".$row[4].";";
-        $index{$chr}{$ind+1}{$id}{exon} .= $row[3]."\t".$row[4].";";
-        $index{$chr}{$ind-1}{$id}{exon} .= $row[3]."\t".$row[4].";";
+      $index{$chr}{$ind}{$id}{exon} .= $row[3]."\t".$row[4].";";
+      $index{$chr}{$ind+1}{$id}{exon} .= $row[3]."\t".$row[4].";";
+      $index{$chr}{$ind-1}{$id}{exon} .= $row[3]."\t".$row[4].";";
     }
   }
   close GFF;

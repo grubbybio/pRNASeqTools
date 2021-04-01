@@ -101,26 +101,19 @@ sub run {
   }
 
   if(!$nomapping){
-
     print $main::tee "\nBuilding index...\n";
-
     symlink $prefix."/reference/".$genome."_chr_all.fasta", $genome."_chr_all.fasta";
     system ("bowtie2-build -q ".$genome."_chr_all.fasta ".$genome."_chr_all");
-
     for(my $i=0;$i<=$#tags;$i++){
       my $tag = $tags[$i];
       my $file = $files[$i];
-
   		print $main::tee "\nMapping $tag...\n";
-
   		if($file !~ /,/){
   			my @files = Function->SRR($file, $thread);
         if($#files == 0){
         	Function->unzip($files[0], $tag);
         	if(defined $adaptor){
-
             print $main::tee "\nTrimming...\n";
-
 						system ("cutadapt -j ".$thread." -m 50 --trim-n -a ".$adaptor." -o ".$tag."_trimmed.fastq ".$tag.".fastq 2>&1");
           	rename $tag."_trimmed.fastq", $tag.".fastq";
         	}
@@ -159,18 +152,14 @@ sub run {
     }
     unlink (glob ($genome."_chr_all*"), "igv.log");
     if(!$mappingonly && defined $input){
-
       print $main::tee "\nFinding peaks...\nFold Enrichment\t$foldchange\tQ Value\t$qvalue\n";
-
       system ("getDifferentialPeaksReplicates.pl -genome ".$prefix."/reference/".$genome."_chr_all.fasta -gff ".$prefix."/reference/".$genome."_genes.gff -f ".$foldchange." -q ".$qvalue." -tbp 1 -style ".$style." -fdr 0.01 -F 2 -L 2 ".$homer_input." ".$homer_bg." ".$homer_ip." > ".$ipp[0].".".$style.".peaks.txt");
     }
 	}else{
     foreach my $pre (@tags){
       symlink "../".$pre, $pre or die $!;
     }
-
     print $main::tee "\nFinding peaks...\nFold Enrichment\t$foldchange\tQ Value\t$qvalue\n";
-
     system ("getDifferentialPeaksReplicates.pl -genome ".$prefix."/reference/".$genome."_chr_all.fasta -gff ".$prefix."/reference/".$genome."_genes.gff -f ".$foldchange." -q ".$qvalue." -tbp 1 -style ".$style." -fdr 0.01 -F 2 -L 2 ".$homer_input." ".$homer_bg." ".$homer_ip." > ".$ipp[0].".".$style.".peaks.txt");
     foreach my $pre (@tags){
       remove_tree $pre;

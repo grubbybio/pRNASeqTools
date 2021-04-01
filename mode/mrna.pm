@@ -122,9 +122,7 @@ sub run {
     for(my $i=0;$i<=$#tags;$i++){
       my $tag = $tags[$i];
       my $file = $files[$i];
-
   		print $main::tee "\nMapping $tag...\n";
-
   		if($file !~ /,/){
         $seqStrategy = "single";
 			  my @files = Function->SRR($file, $thread);
@@ -269,7 +267,7 @@ sub countBAM {
 	my %count = ();
 	my $countSum = 0;
 	if($seqStrategy eq "single"){
-		system ("featureCounts -T ".$thread." -C -O -G ".$prefix."/reference/".$genome."_chr_all.fasta -s 0 -a ".$genome."_genes.gtf -o total.count ".$tag.".bam 2>&1");
+		system ("featureCounts -T ".$thread." -O -G ".$prefix."/reference/".$genome."_chr_all.fasta -s 0 -a ".$genome."_genes.gtf -o total.count ".$tag.".bam 2>&1");
 	}elsif($seqStrategy eq "paired"){
 		system ("featureCounts -T ".$thread." -p -B -C -O -G ".$prefix."/reference/".$genome."_chr_all.fasta -s 0 -a ".$genome."_genes.gtf -o total.count ".$tag.".bam 2>&1");
 	}

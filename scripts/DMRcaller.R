@@ -42,7 +42,7 @@ for(j in 2:length(genotype)){
   }
   for(l in 1:3){
     message(paste("Calculating",context[l],"...",sep=" "))
-    DMRsReplicatesRegions <- computeDMRsReplicates(compareList, condition = condition, context = context[l], method = "neighbourhood", minProportionDifference = diff[l], cores = thread)
+    DMRsReplicatesRegions <- computeDMRsReplicates(compareList, condition = condition, context = context[l], method = "bins", minProportionDifference = diff[l], cores = thread)
     write.csv(DMRsReplicatesRegions, paste(genotype[j],'vs',genotype[1],context[l],'csv',sep="."), quote = FALSE)
   }
 }

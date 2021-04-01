@@ -6,7 +6,7 @@ use MooseX::App::Command;
 extends qw/mode/;
 use validate_options;
 use input;
-use File::Path qw/remove_tree/;
+use File::Path qw/remove_tree make_path/;
 use Function;
 use Ref;
 
@@ -32,6 +32,12 @@ option 'mmap' => (
   default => 'u',
   documentation => q[method for assigning multiple mapped reads. Allowed: u, n, f, r],
 );
+option 'mismatches' => (
+  is => 'rw',
+  isa => 'Num',
+  default => '1',
+  documentation => q[Number of mismatches allowed. Allowed: 0, 1, 2],
+);
 
 sub run {
   my ($self) = @_;
@@ -46,6 +52,7 @@ sub run {
   my $control = $options{'control'};
   my $treatment = $options{'treatment'};
   my $mmap = $options{'mmap'};
+  my $mismatches = $options{'mismatches'};
 
   my ($tags_ref, $files_ref, $par_ref) = input->run($control);
   my @tags = @$tags_ref;
@@ -58,52 +65,39 @@ sub run {
   my $par = join " ", @tags;
 
   if(!$nomapping){
-
     die "Please specify the 3\' adaptor!" if($adaptor eq "");
-    my %geneinfo = Ref->geneinfo($prefix, $genome);
-    rename "transcripts.fa", $genome.".fa";
-    system ("bowtie-build -q ".$genome.".fa ".$genome);
-    system ("gffread -T ".$prefix."/reference/".$genome."_genes.gff -o ".$genome.".gtf");
-
+    remove_tree "Genome" if(-e "Genome");
+    make_path "Genome";
+    system ("STAR --runThreadN ".$thread." --genomeDir Genome --runMode genomeGenerate --genomeSAindexNbases 12 --genomeFastaFiles ".$prefix."/reference/".$genome."_chr_all.fasta --sjdbGTFfile ".$prefix."/reference/".$genome."_genes.gff --sjdbGTFtagExonParentTranscript Parent --sjdbGTFtagExonParentGene ID --limitGenomeGenerateRAM 64000000000");
+    system ("gffread -T -C -o ".$genome.".gtf -g ".$prefix."/reference/".$genome."_chr_all.fasta ".$prefix."/reference/".$genome."_genes.gff");
     for(my $i=0;$i<=$#tags;$i++){
       my $tag = $tags[$i];
       my $file = $files[$i];
-
       $file = Function->SRR($file, $thread);
       Function->unzip($file, $tag);
       if(defined $adaptor){
-
         print $main::tee "\nTrimming $tag...\n";
-
         system ("cutadapt -j ".$thread." -m 18 -M 42 --discard-untrimmed --trim-n -a ".$adaptor." -o ".$tag."_trimmed.fastq ".$tag.".fastq 2>&1");
         rename $tag."_trimmed.fastq", $tag.".fastq";
       }
-
       print $main::tee "\nStart mapping...\n";
-
-      system ("ShortStack --outdir ShortStack_".$tag." --align_only --bowtie_m 10 --ranmax 10 --mmap ".$mmap." --mismatches 0 --bowtie_cores ".$thread." --nohp --readfile ".$tag.".fastq --genomefile ".$genome.".fa 2>&1");
-
-      print $main::tee "\nAlignment Completed!\n";
-
-      system ("samtools view -h ShortStack_".$tag."/".$tag."_trimmed.bam | awk '{if(\$10!=\"*\" && \$3!=\"*\") print}' > ".$tag.".sam");
-      system ("samtools view -Sb --thread ".$thread." ".$tag.".sam > ".$tag.".bam");
+      system ("STAR --genomeDir Genome --alignIntronMax 5000 --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --quantMode TranscriptomeSAM --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag.".fastq 2>&1");
+      system ("samtools view -h -F 0x100 Aligned.toTranscriptome.out.bam |samtools sort -o ".$tag.".bam -");
       system ("samtools index ".$tag.".bam");
-      system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --ignoreDuplicates --filterRNAstrand forward --normalizeUsing RPKM -o ".$tag.".forward.bw");
-      system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --ignoreDuplicates --filterRNAstrand reverse --normalizeUsing RPKM -o ".$tag.".reverse.bw");
-      remove_tree("ShortStack_".$tag);
-      unlink ($tag.".sam", $tag.".fastq");
+      system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --filterRNAstrand forward --normalizeUsing RPKM -o ".$tag.".bw");
+      unlink $tag.".fastq";
     }
-
+    unlink ("Aligned.sortedByCoord.out.bam", "Aligned.toTranscriptome.out.bam", glob ("Log.*"), "SJ.out.tab");
     system ("Rscript --vanilla ".$prefix."/scripts/ribo.R ".$genome." ".$par) if(!$mappingonly);
-    unlink ($genome.".fa", glob ($genome."*.ebwt"), $genome.".gtf", $genome.".fa.fai");
-
+    unlink ($genome.".gtf");
+    remove_tree "Genome";
   }else{
     foreach my $pre (@tags){
       symlink "../".$pre.".bam", $pre.".bam" or die $!;
     }
     Ref->geneinfo($prefix, $genome);
     rename "transcripts.fa", $genome.".fa";
-    system ("gffread -T ".$prefix."/reference/".$genome."_genes.gff -o ".$genome.".gtf");
+    system ("gffread -T -C -o ".$genome.".gtf -g ".$prefix."/reference/".$genome."_chr_all.fasta ".$prefix."/reference/".$genome."_genes.gff");
     system ("Rscript --vanilla ".$prefix."/scripts/ribo.R ".$genome." ".$par);
     unlink ($genome.".gtf", glob ("*.bam"), $genome.".fa");
   }
