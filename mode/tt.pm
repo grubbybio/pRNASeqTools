@@ -145,7 +145,7 @@ sub run {
           $seq = substr($fas{$mir{$mm}{"chromosome"}}, $features[0], $features[1]-$features[0]);
           $flank1 = $features[0] - $lim1;
           $flank2 = $lim2 - $features[1] - length($features[2]);
-          if($mir{$mm}{"start"} == $features[0]){
+          if($mir{$mm}{"start"} == $features[0]+1){
             if($length-$features[1]+$features[0]-1 < 0){
               $out{$mm}{$features[1]-$features[0]-$length+length($features[2])}{0} += $mir{$mm}{"read"}{$read}{"count"};
             }else{

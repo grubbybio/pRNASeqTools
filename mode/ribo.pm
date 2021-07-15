@@ -77,7 +77,7 @@ sub run {
       Function->unzip($file, $tag);
       if(defined $adaptor){
         print $main::tee "\nTrimming $tag...\n";
-        system ("cutadapt -j ".$thread." -m 18 -M 42 --discard-untrimmed --trim-n -a ".$adaptor." -o ".$tag."_trimmed.fastq ".$tag.".fastq 2>&1");
+        system ("cutadapt -j ".$thread." -m 18 --discard-untrimmed --trim-n -a ".$adaptor." -o ".$tag."_trimmed.fastq ".$tag.".fastq 2>&1");
         rename $tag."_trimmed.fastq", $tag.".fastq";
       }
       print $main::tee "\nStart mapping...\n";

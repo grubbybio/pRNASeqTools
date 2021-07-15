@@ -11,7 +11,7 @@ sequences <- paste(args[1], "fa", sep=".")
 annotation <- GFF3File(paste(args[1], "gff", sep="."))
 file <- c(treated = paste(args[1],"filtered","bam",sep="."))
 mrms <- ModRiboMethSeq(file, annotation = annotation, sequences = sequences)
-settings(mrms) <- list(minScoreMean = 0.8, minScoreRMS = 0.8, minCoverage = as.integer(args[2]))
+settings(mrms) <- list(minScoreMean = 0.93, minScoreRMS = 0.5, minCoverage = as.integer(args[2]))
 modify(mrms,force = TRUE) -> mrms
 sink(paste(args[1],"RMS","wig",sep="."))
 for(i in 1:length(ranges(mrms))){

@@ -18,18 +18,18 @@ for(i in 1:length(tags)){
   example_frames_stratified <- frame_psite_length(reads_psite_list, sample = tags[i], region = "all", cl = 90)
   example_frames <- frame_psite(reads_psite_list, sample = tags[i], region = "all")
 
-  pdf(file=paste(tags[i],"pdf",sep="."),6,6)
-  print(example_length_dist_zoom[["plot"]])
+  pdf(file=paste(tags[i],"pdf",sep="."),12,6)
+  print(example_length_dist_zoom[[paste("plot",tags[i],sep = "_")]])
   print(example_ends_heatmap[["plot"]])
   print(example_psite_region[["plot"]])
   print(example_frames_stratified[["plot"]])
   print(example_frames[["plot"]])
-  try({
-    for (j in c(19:21,28:32)){
-      example_metaprofile <- metaprofile_psite(reads_psite_list, ann, sample = tags[i], utr5l = 20, cdsl = 40, utr3l = 20, plot_title = "auto", length_range = j)
-      print(example_metaprofile[["plot"]])
-    }
-  }, silent = TRUE)
+  for (j in c(19:21,28:32)){
+    try({
+      example_metaprofile <- metaprofile_psite(reads_psite_list, ann, sample = tags[i], utr5l = 20, cdsl = 40, utr3l = 20, plot_title = "sample.transcript.length_range", length_range = j)
+      print(example_metaprofile[[paste("plot",tags[i],sep = "_")]])
+    }, silent = TRUE)
+  }
   #codon_usage_barplot <- codon_usage_psite(reads_psite_list, ann, sample = tags[i], fastapath = paste(genome,'fa',sep="."), fasta_genome = F)
   dev.off()
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package mode::chip;
+package mode::atac;
 
 use Modern::Perl;
 use MooseX::App::Command;
@@ -10,9 +10,9 @@ use Function;
 use validate_options;
 use input;
 
-command_short_description q[Analysis for ChIP-seq];
-command_long_description q[Analysis for ChIP-seq];
-command_usage q[pRNASeqTools chip [OPTIONS] --control [CONTROL]=[file1]+[file2] ... --treatment [TREATMENT1]=[file1]+[file2] ... --treatment [TREATMENT2]=[file1]+[file2] ... ];
+command_short_description q[Analysis for ATAC-seq];
+command_long_description q[Analysis for ATAC-seq];
+command_usage q[pRNASeqTools atac [OPTIONS] --control [CONTROL]=[file1]+[file2] ... --treatment [TREATMENT1]=[file1]+[file2] ... --treatment [TREATMENT2]=[file1]+[file2] ... ];
 
 option 'no-mapping' => (
   is => 'rw',
@@ -141,7 +141,7 @@ sub run {
     }
     unlink (glob ($genome."_chr_all*"), "igv.log");
     if(!$mappingonly && defined $input){
-      my $command = "Genrich -r -v -a 20 ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt 2>&1";
+      my $command = "Genrich -j -r -v -a 20 -e chrC,chrM ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt";
       if($qvalue < 1){
         print $main::tee "\nFinding peaks...\nAUC\t$auc\tQ Value\t$qvalue\n";
         $command .= " -q $qvalue";
@@ -149,21 +149,22 @@ sub run {
         print $main::tee "\nFinding peaks...\nAUC\t$auc\tP Value\t$pvalue\n";
         $command .= " -p $pvalue";
       }
-      system $command;
+      system $command." 2>&1";
     }
 	}else{
     foreach my $pre (@tags){
-      symlink "../".$pre, $pre or die $!;
+      symlink "../".$pre.".sorted.name.bam", $pre.".sorted.name.bam" or die $!;
     }
-    my $command = "Genrich -r -v -a 20 ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt 2>&1";
+    my $command = "Genrich -j -r -v -a 20 ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt";
     if($qvalue < 1){
       print $main::tee "\nFinding peaks...\nAUC\t$auc\tQ Value\t$qvalue\n";
       $command .= " -q $qvalue";
+      print $main::tee "$command\n";
     }else{
       print $main::tee "\nFinding peaks...\nAUC\t$auc\tP Value\t$pvalue\n";
       $command .= " -p $pvalue";
     }
-    system $command;
+    system $command." 2>&1";
     foreach my $pre (@tags){
       remove_tree $pre;
     }

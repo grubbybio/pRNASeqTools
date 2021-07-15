@@ -144,7 +144,7 @@ sub rmvc { #remove 3' polyC and reverse compliment
 	close COUT;
 	close COUT2 if($tag[1]);
 
-	print $main::tee "The 3' PolyC is removed!\n";
+	print STDERR "The 3' PolyC is removed!\n";
 }
 
 1;

@@ -253,15 +253,12 @@ sub sta {
   my ($self, $mnorm, $prefix, $genome, $foldchange, $pvalue, $binsize, $par) = @_;
 
 	print $main::tee "\nDSR analysis...\nNormalization $mnorm\tFold Change $foldchange\tP Value $pvalue\n";
-
 	system ("Rscript --vanilla ".$prefix."/scripts/DSR.R ".$mnorm." ".$pvalue." ".$foldchange." ".$par);
-
   opendir my $dir, "." or die $!;
   my @dirdd = grep {/csv$/} readdir $dir;
   my @dird = grep {/$mnorm\.bin/} @dirdd;
   my @dir = grep {/hyper|hypo/} @dird;
   closedir $dir;
-
   foreach my $hcsv (@dir){
     open CSV, "$hcsv" or die $!;
     (my $bg = $hcsv) =~ s/csv$/bedgraph/;
@@ -303,19 +300,12 @@ sub sta {
 	}
 
 	print $main::tee "\nDE miRNA analysis...\nNormalization $mnorm\tFold Change $foldchange\tP Value $pvalue\n";
-
 	system ("Rscript --vanilla ".$prefix."/scripts/DEM.R ".$mnorm." ".$pvalue." ".$foldchange." ".$par);
-
 	print $main::tee "\nDS gene analysis...\nNormalization $mnorm\tFold Change $foldchange\tP Value $pvalue\n";
-
 	system ("Rscript --vanilla ".$prefix."/scripts/DSG.R ".$mnorm." ".$pvalue." ".$foldchange." ".$par);
-
 	print $main::tee "\nDS TE analysis...\nNormalization $mnorm\tFold Change $foldchange\tP Value $pvalue\n";
-
 	system ("Rscript --vanilla ".$prefix."/scripts/DST.R ".$mnorm." ".$pvalue." ".$foldchange." ".$par);
-
 	print $main::tee "\nDS Promoter analysis...\nNormalization $mnorm\tFold Change $foldchange\tP Value $pvalue\n";
-
 	system ("Rscript --vanilla ".$prefix."/scripts/DSP.R ".$mnorm." ".$pvalue." ".$foldchange." ".$par);
 }
 
