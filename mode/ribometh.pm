@@ -107,8 +107,8 @@ sub run {
         print GFF "$geneID\treference\tmRNA\t1\t$geneinfo{$geneID}\t.\t+\t.\tID=$geneID\.$geneSeq{$geneID}{transcriptID};Parent=$geneID\n";
         print GFF "$geneID\treference\texon\t1\t$geneinfo{$geneID}\t.\t+\t.\tID=$geneID:exon:1;Parent=$geneID\.$geneSeq{$geneID}{transcriptID}\n";
       }
-      close REF;
       close GFF;
+      close REF;
       unlink "transcripts.fa";
     }else{
       if($reference =~ /^~\/(.+)/){
@@ -117,11 +117,29 @@ sub run {
         $reference = abs_path "../".$reference;
       }
       symlink $reference.".fa", "reference.fa";
-      symlink $reference.".gff", "reference.gff";
+      open REF, "<reference.fa" or die $!;
+      while(my $ref = <REF>){
+        chomp $ref;
+        if($ref =~ />(.+)/){
+          $geneID = $1;
+          $geneSeq{$geneID}{"transcriptID"} = 1;
+        }else{
+          $geneSeq{$geneID}{"seq"} .= $ref;
+        }
+      }
+      open GFF, ">reference.gff" or die $!;
+      foreach $geneID (sort keys %geneSeq){
+        $geneinfo{$geneID} = length $geneSeq{$geneID}{"seq"};
+        print GFF "$geneID\treference\tgene\t1\t$geneinfo{$geneID}\t.\t+\t.\tID=$geneID\n";
+        print GFF "$geneID\treference\tmRNA\t1\t$geneinfo{$geneID}\t.\t+\t.\tID=$geneID\.$geneSeq{$geneID}{transcriptID};Parent=$geneID\n";
+        print GFF "$geneID\treference\texon\t1\t$geneinfo{$geneID}\t.\t+\t.\tID=$geneID:exon:$geneSeq{$geneID}{transcriptID};Parent=$geneID\.1\n";
+      }
+      close REF;
+      close GFF;
     }
     remove_tree "Genome" if(-e "Genome");
     make_path "Genome";
-    system ("STAR --runThreadN ".$thread." --genomeDir Genome --runMode genomeGenerate --genomeFastaFiles reference.fa --sjdbGTFfile reference.gff --sjdbGTFtagExonParentTranscript Parent --sjdbGTFtagExonParentGene ID --limitGenomeGenerateRAM 64000000000");
+    system ("STAR --runThreadN ".$thread." --genomeDir Genome --runMode genomeGenerate --genomeFastaFiles reference.fa --sjdbGTFfile reference.gff --sjdbGTFtagExonParentTranscript Parent --sjdbGTFtagExonParentGene ID --limitGenomeGenerateRAM 64000000000 --genomeSAindexNbases 5");
 
     for(my $i=0;$i<=$#tags;$i++){
       my $tag = $tags[$i];
@@ -140,7 +158,7 @@ sub run {
 						system ("cutadapt -j ".$thread." -m 15 --trim-n -a ".$adaptor." -o ".$tag."_trimmed.fastq ".$tag.".fastq 2>&1");
           	rename $tag."_trimmed.fastq", $tag.".fastq";
         	}
-          system ("STAR --genomeDir Genome --alignIntronMax 5000 --outSAMtype SAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag.".fastq 2>&1");
+          system ("STAR --genomeDir Genome --seedSearchStartLmax 15 --outSAMtype SAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag.".fastq 2>&1");
           unlink ($tag.".fastq");
         }else{
           Function->unzip($files[0], $tag."_R1");
@@ -153,7 +171,7 @@ sub run {
             rename $tag."_R1_trimmed.fastq", $tag."_R1.fastq";
             rename $tag."_R2_trimmed.fastq", $tag."_R2.fastq";
           }
-          system ("STAR --genomeDir Genome --alignIntronMax 5000 --outSAMtype SAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag."_R1.fastq ".$tag."_R2.fastq 2>&1");
+          system ("STAR --genomeDir Genome --seedSearchStartLmax 15 --outSAMtype SAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag."_R1.fastq ".$tag."_R2.fastq 2>&1");
           unlink ($tag."_R1.fastq", $tag."_R2.fastq");
         }
   		}else{
@@ -165,7 +183,7 @@ sub run {
           rename $tag."_R1_trimmed.fastq", $tag."_R1.fastq";
           rename $tag."_R2_trimmed.fastq", $tag."_R2.fastq";
         }
-        system ("STAR --genomeDir Genome --alignIntronMax 5000 --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag."_R1.fastq ".$tag."_R2.fastq 2>&1");
+        system ("STAR --genomeDir Genome --seedSearchStartLmax 15 --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag."_R1.fastq ".$tag."_R2.fastq 2>&1");
         unlink ($tag."_R1.fastq", $tag."_R2.fastq");
   		}
       system ("samtools view -h Aligned.sortedByCoord.out.bam > ".$tag.".sam");
