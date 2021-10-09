@@ -70,6 +70,7 @@ sub run {
     make_path "Genome";
     system ("STAR --runThreadN ".$thread." --genomeDir Genome --runMode genomeGenerate --genomeSAindexNbases 12 --genomeFastaFiles ".$prefix."/reference/".$genome."_chr_all.fasta --sjdbGTFfile ".$prefix."/reference/".$genome."_genes.gff --sjdbGTFtagExonParentTranscript Parent --sjdbGTFtagExonParentGene ID --limitGenomeGenerateRAM 64000000000");
     system ("gffread -T -C -o ".$genome.".gtf -g ".$prefix."/reference/".$genome."_chr_all.fasta ".$prefix."/reference/".$genome."_genes.gff");
+    system ("grep \"^chr[0-9]\" ".$genome.".gtf > tmp; mv tmp ".$genome.".gtf");
     for(my $i=0;$i<=$#tags;$i++){
       my $tag = $tags[$i];
       my $file = $files[$i];
