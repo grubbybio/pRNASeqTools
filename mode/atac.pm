@@ -141,7 +141,7 @@ sub run {
     }
     unlink (glob ($genome."_chr_all*"), "igv.log");
     if(!$mappingonly && defined $input){
-      my $command = "Genrich -j -r -v -a 20 -e chrC,chrM ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt";
+      my $command = "Genrich -j -r -v -a 20 -e chrC,chrM ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".gain.narrowPeak.txt";
       if($qvalue < 1){
         print $main::tee "\nFinding peaks...\nAUC\t$auc\tQ Value\t$qvalue\n";
         $command .= " -q $qvalue";
@@ -155,7 +155,7 @@ sub run {
     foreach my $pre (@tags){
       symlink "../".$pre.".sorted.name.bam", $pre.".sorted.name.bam" or die $!;
     }
-    my $command = "Genrich -j -r -v -a 20 ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt";
+    my $command = "Genrich -j -r -v -a 20 ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".gain.narrowPeak.txt";
     if($qvalue < 1){
       print $main::tee "\nFinding peaks...\nAUC\t$auc\tQ Value\t$qvalue\n";
       $command .= " -q $qvalue";

@@ -260,33 +260,34 @@ sub lengthofchrom {
 
 sub gann {
   my ($self, $prefix, $genome) = @_;
-  my %gann;
-
-  open BIN, $prefix."/reference/".$genome.".BIN";
-  open FUN, $prefix."/reference/".$genome.".functional.annotation";
-  while(my $aa = <BIN>){
-    chomp $aa;
-    my ($geneID, $bin) = split /\t/, $aa;
-    $gann{$geneID} .= $bin.";";
-  }
-  close BIN;
-  foreach my $gene (keys %gann){
-    chop $gann{$gene};
-  }
-  while(my $bb = <FUN>){
-    chomp $bb;
-    my @fann = split /\t/, $bb;
-    if($fann[0] =~ /(\w+)\.1$/){
-      my $geneID = $1;
-      if(exists $gann{$geneID}){
-        $gann{$geneID} .= ",\"$fann[1]\",\"$fann[2]\",\"$fann[3]\",\"$fann[4]\"";
-      }else{
-        $gann{$geneID} .= "NA,\"$fann[1]\",\"$fann[2]\",\"$fann[3]\",\"$fann[4]\"";
+  my %gann = ();
+  if(-e $prefix."/reference/".$genome.".BIN"){
+    open BIN, $prefix."/reference/".$genome.".BIN";
+    open FUN, $prefix."/reference/".$genome.".functional.annotation";
+    while(my $aa = <BIN>){
+      chomp $aa;
+      my ($geneID, $bin) = split /\t/, $aa;
+      $gann{$geneID} .= $bin.";";
+    }
+    close BIN;
+    foreach my $gene (keys %gann){
+      chop $gann{$gene};
+    }
+    while(my $bb = <FUN>){
+      chomp $bb;
+      my @fann = split /\t/, $bb;
+      if($fann[0] =~ /(\w+)\.1$/){
+        my $geneID = $1;
+        if(exists $gann{$geneID}){
+          $gann{$geneID} .= ",\"$fann[1]\",\"$fann[2]\",\"$fann[3]\",\"$fann[4]\"";
+        }else{
+          $gann{$geneID} .= "NA,\"$fann[1]\",\"$fann[2]\",\"$fann[3]\",\"$fann[4]\"";
+        }
       }
     }
+    close FUN;
   }
-  close FUN;
-  return %gann
+  return %gann;
 }
 1;
 __END__

@@ -4,7 +4,6 @@ package mode::chip;
 use Modern::Perl;
 use MooseX::App::Command;
 extends qw(mode);
-use File::Path qw(remove_tree);
 use File::Cat;
 use Function;
 use validate_options;
@@ -132,16 +131,19 @@ sub run {
   			unlink ($tag."_R1.fastq", $tag."_R2.fastq");
   		}
   		system ("samtools view -Sb -q 10 --threads ".$thread." ".$tag.".sam > ".$tag.".bam");
-      system ("samtools sort -o ".$tag.".sorted.bam ".$tag.".bam");
-      system ("samtools index ".$tag.".sorted.bam");
+      unlink $tag.".sam";
       system ("samtools sort -n -o ".$tag.".sorted.name.bam ".$tag.".bam");
-      unlink $tag.".sam", $tag.".bam";
-      system ("bamCoverage -b ".$tag.".sorted.bam -bs 5 -p ".$thread." --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
+      system ("samtools fixmate -m ".$tag.".sorted.name.bam ".$tag.".fixmate.bam");
+      system ("samtools sort -o ".$tag.".sorted.bam ".$tag.".fixmate.bam");
+      system ("samtools markdup -r ".$tag.".sorted.bam ".$tag.".sorted.dedup.bam");
+      system ("samtools index ".$tag.".sorted.dedup.bam");
+      unlink $tag.".bam", $tag.".fixmate.bam", $tag.".sorted.bam";
+      system ("bamCoverage -b ".$tag.".sorted.dedup.bam -bs 5 -p ".$thread." --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
   		print $main::tee "\nMapping completed!\n";
     }
     unlink (glob ($genome."_chr_all*"), "igv.log");
     if(!$mappingonly && defined $input){
-      my $command = "Genrich -r -v -a 20 ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt 2>&1";
+      my $command = "Genrich -r -v ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt 2>&1";
       if($qvalue < 1){
         print $main::tee "\nFinding peaks...\nAUC\t$auc\tQ Value\t$qvalue\n";
         $command .= " -q $qvalue";
@@ -153,9 +155,9 @@ sub run {
     }
 	}else{
     foreach my $pre (@tags){
-      symlink "../".$pre, $pre or die $!;
+      symlink "../".$pre.".sorted.name.bam", $pre.".sorted.name.bam" or die $!;
     }
-    my $command = "Genrich -r -v -a 20 ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt 2>&1";
+    my $command = "Genrich -r -v ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt 2>&1";
     if($qvalue < 1){
       print $main::tee "\nFinding peaks...\nAUC\t$auc\tQ Value\t$qvalue\n";
       $command .= " -q $qvalue";
@@ -165,7 +167,7 @@ sub run {
     }
     system $command;
     foreach my $pre (@tags){
-      remove_tree $pre;
+      unlink $pre.".sorted.name.bam";
     }
   }
 }

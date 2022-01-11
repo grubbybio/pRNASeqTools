@@ -202,7 +202,7 @@ sub run {
 
       system ("awk -F \"\t\" '{a=substr(FILENAME,1,length(FILENAME)-3);if(\$11>=18 && \$11 <= 26) {print \$0 > (a\$11\".bed\")}}' ".$tag.".bed");
       system ("awk '!a[\$4]++' ".$tag.".bed \| awk '{print \$11}' \| sort \| uniq -c \| awk '{OFS=\"\t\"; print \$2, \$1}' > ".$tag.".len_dist.txt");
-      system ("awk '{n+=\$2}END{print \"total\t\"n}' ".$tag.".len_dist.txt >> ".$tag.".nf");
+      system ("awk '{if(\$1<=28){n+=\$2}}END{print \"total\t\"n}' ".$tag.".len_dist.txt >> ".$tag.".nf");
 
       print $main::tee "\nLength distribution summary done!\nCounting start...\n";
 
