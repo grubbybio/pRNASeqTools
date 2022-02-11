@@ -140,6 +140,7 @@ sub run {
       unlink $tag.".bam", $tag.".fixmate.bam", $tag.".sorted.bam";
       system ("bamCoverage -b ".$tag.".sorted.dedup.bam -bs 5 -p ".$thread." --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
   		print $main::tee "\nMapping completed!\n";
+      system ("Genrich -r -v -g 200 -p 0.001 -t ".$tag.".sorted.name.bam -o ".$tag.".narrowPeak.txt");
     }
     unlink (glob ($genome."_chr_all*"), "igv.log");
     if(!$mappingonly && defined $input){

@@ -131,13 +131,17 @@ sub run {
         system ("bowtie2 -p ".$thread." -x ".$genome."_chr_all -1 ".$tag."_R1.fastq -2 ".$tag."_R2.fastq -S ".$tag.".sam 2>&1");
   			unlink ($tag."_R1.fastq", $tag."_R2.fastq");
   		}
-  		system ("samtools view -Sb -q 10 --threads ".$thread." ".$tag.".sam > ".$tag.".bam");
-      system ("samtools sort -o ".$tag.".sorted.bam ".$tag.".bam");
-      system ("samtools index ".$tag.".sorted.bam");
+      system ("samtools view -Sb -q 10 --threads ".$thread." ".$tag.".sam > ".$tag.".bam");
+      unlink $tag.".sam";
       system ("samtools sort -n -o ".$tag.".sorted.name.bam ".$tag.".bam");
-      unlink $tag.".sam", $tag.".bam";
-      system ("bamCoverage -b ".$tag.".sorted.bam -bs 5 -p ".$thread." --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
+      system ("samtools fixmate -m ".$tag.".sorted.name.bam ".$tag.".fixmate.bam");
+      system ("samtools sort -o ".$tag.".sorted.bam ".$tag.".fixmate.bam");
+      system ("samtools markdup -r ".$tag.".sorted.bam ".$tag.".sorted.dedup.bam");
+      system ("samtools index ".$tag.".sorted.dedup.bam");
+      unlink $tag.".bam", $tag.".fixmate.bam", $tag.".sorted.bam";
+      system ("bamCoverage -b ".$tag.".sorted.dedup.bam -bs 5 -p ".$thread." --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
   		print $main::tee "\nMapping completed!\n";
+      system ("Genrich -r -v -g 200 -p 0.001 -t ".$tag.".sorted.name.bam -o ".$tag.".narrowPeak.txt");
     }
     unlink (glob ($genome."_chr_all*"), "igv.log");
     if(!$mappingonly && defined $input){

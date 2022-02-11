@@ -1,17 +1,17 @@
 # INSTALL
-1. Add the path into the bash profile file (.bash_profile or .bashrc or .zshrc if you are using zsh).
+1. Create a new conda environment for `pRNASeqTools` with Python 3.
+
+2. Add the path into the bash profile file (.bash_profile or .bashrc or .zshrc if you are using zsh).
 ```bash
 export PATH=/path/to/pRNASeqTools:$PATH
 ```
-2. You may ask the author for the `reference` files, which should be placed in the `pRNASeqTools` folder.
+3. You may ask the author for the `reference` files, which should be placed in the `pRNASeqTools` folder.
 
-3. Re-login or `source` the modified bash profile.
+4. Re-login or `source` the modified bash profile.
 
-4. Run `pRNASeqTools`, see if there are any error messages. Usually it will tell you which dependency is missing.
+5. Run `pRNASeqTools`, see if there are any error messages. Usually it will tell you which dependency is missing.
 
-5. Using `conda` to install neccesary dependencies, until `pRNASeqTools` shows the command menu.
-
-   **Note: The python package `clipper` is only compatible with Python 2.**
+6. Using `conda` to install neccesary dependencies, until `pRNASeqTools` shows the command menu.
 
    1. `cutadapt`
       Martin M. Cutadapt removes adapter sequences from high-throughput sequencing reads. **_EMBnet. journal_**, 2011, 17(1): pp. 10-12.
@@ -52,7 +52,5 @@ export PATH=/path/to/pRNASeqTools:$PATH
 
    12. `UMItools`
        Smith T S, Heger A and Sudbery I. UMI-tools: Modelling sequencing errors in Unique Molecular Identifiers to improve quantification accuracy. ***Genome Res.*** gr.209601.116
-
-6. Specifically, to properly check the `homer` packages by `pRNASeqTools`, download the software from [the official website](http://homer.ucsd.edu/homer/) first. Then, you need to install the genome `tair10` and make the file `configureHomer.pl` executable.
 
 7. Specifically, the CLIP-seq analysis needs a customized GFF file located in the `data` folder of `clipper`. The example GFF of _Arabidopsis thaliana_ is available upon request.

@@ -24,7 +24,7 @@ for(i in 1:length(tags)){
   print(psite_region[["plot"]])
   print(frames_stratified[["plot"]])
   print(frames[["plot"]])
-  for (j in c(19:21,28:32)){
+  for (j in 18:75){
     try({
       metaprofile <- metaprofile_psite(reads_psite_list, ann, sample = tags[i], utr5l = 20, cdsl = 40, utr3l = 20, plot_title = "sample.transcript.length_range", length_range = j)
       print(metaprofile[[paste("plot",tags[i],sep = "_")]])

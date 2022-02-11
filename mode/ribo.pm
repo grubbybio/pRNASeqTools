@@ -4,6 +4,7 @@ package mode::ribo;
 use Modern::Perl;
 use MooseX::App::Command;
 extends qw/mode/;
+use File::Cat;
 use validate_options;
 use input;
 use File::Path qw/remove_tree make_path/;
@@ -26,18 +27,6 @@ option 'mapping-only' => (
   default => 0,
   documentation => q[Do not perform the ribo-seq analysis and only align the reads to the transcriptome],
 );
-option 'mmap' => (
-  is => 'rw',
-  isa => 'Str',
-  default => 'u',
-  documentation => q[method for assigning multiple mapped reads. Allowed: u, n, f, r],
-);
-option 'mismatches' => (
-  is => 'rw',
-  isa => 'Num',
-  default => '1',
-  documentation => q[Number of mismatches allowed. Allowed: 0, 1, 2],
-);
 
 sub run {
   my ($self) = @_;
@@ -52,7 +41,6 @@ sub run {
   my $control = $options{'control'};
   my $treatment = $options{'treatment'};
   my $mmap = $options{'mmap'};
-  my $mismatches = $options{'mismatches'};
 
   my ($tags_ref, $files_ref, $par_ref) = input->run($control);
   my @tags = @$tags_ref;
@@ -83,12 +71,14 @@ sub run {
       }
       print $main::tee "\nStart mapping...\n";
       system ("STAR --genomeDir Genome --alignIntronMax 5000 --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --quantMode TranscriptomeSAM --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag.".fastq 2>&1");
+      cat 'Log.final.out', \*STDOUT;
       system ("samtools view -h -F 0x100 Aligned.toTranscriptome.out.bam |samtools sort -o ".$tag.".bam -");
       system ("samtools index ".$tag.".bam");
-      system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --filterRNAstrand forward --normalizeUsing RPKM -o ".$tag.".bw");
+      system ("samtools index Aligned.sortedByCoord.out.bam");
+      system ("bamCoverage -b Aligned.sortedByCoord.out.bam -bs 5 -p ".$thread." --filterRNAstrand forward --normalizeUsing RPKM -o ".$tag.".bw");
       unlink $tag.".fastq";
     }
-    unlink ("Aligned.sortedByCoord.out.bam", "Aligned.toTranscriptome.out.bam", glob ("Log.*"), "SJ.out.tab");
+    unlink ("Aligned.sortedByCoord.out.bam", "Aligned.sortedByCoord.out.bam.bai", "Aligned.toTranscriptome.out.bam", glob ("Log.*"), "SJ.out.tab");
     system ("Rscript --vanilla ".$prefix."/scripts/ribo.R ".$genome." ".$par) if(!$mappingonly);
     unlink ($genome.".gtf");
     remove_tree "Genome";

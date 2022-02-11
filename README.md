@@ -1,8 +1,11 @@
 # pRNASeqTools
-Integrated High-throughput Sequencing Data Analysis of Plant
+Integrated High-throughput Sequencing Data Analysis for Plant
+
 Author: Dr. Chenjiang You
+
 Current Version: 0.8
-Latest updata: 12/04/2019
+
+Latest updata: 02/09/2022
 
 - - - -
 ### Introduction
