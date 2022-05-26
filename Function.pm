@@ -147,6 +147,25 @@ sub rmvc { #remove 3' polyC and reverse compliment
 	print STDERR "The 3' PolyC is removed!\n";
 }
 
+sub fastq2fasta {
+	my ($self, $input, $output) = $_;
+	my $nr = 1;
+	open INPUT, "<$input" or die $!;
+	open OUTPUT, ">$output" or die $!;
+	while(my $row = <INPUT>){
+		chomp $row;
+		if($nr == 1 or $nr == 2){
+			$row = s/^@/>/;
+			print OUTPUT "$row\n";
+		}elsif($nr == 4){
+			$nr = 0;
+		}
+		$nr ++;
+	}
+	close INPUT;
+	close OUTPUT;
+}
+
 1;
 
 __END__

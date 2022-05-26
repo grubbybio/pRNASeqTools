@@ -10,6 +10,8 @@ use input;
 use File::Path qw/remove_tree make_path/;
 use Function;
 use Ref;
+use File::Copy qw/mv/;
+use Cwd qw/abs_path/;
 
 command_short_description q[Analysis for Ribo-seq];
 command_long_description q[Analysis for Ribo-seq];
@@ -28,6 +30,7 @@ option 'mapping-only' => (
   documentation => q[Do not perform the ribo-seq analysis and only align the reads to the transcriptome],
 );
 
+
 sub run {
   my ($self) = @_;
 
@@ -41,6 +44,7 @@ sub run {
   my $control = $options{'control'};
   my $treatment = $options{'treatment'};
   my $mmap = $options{'mmap'};
+  my $mask = $options{'mask'};
 
   my ($tags_ref, $files_ref, $par_ref) = input->run($control);
   my @tags = @$tags_ref;
@@ -54,11 +58,20 @@ sub run {
 
   if(!$nomapping){
     die "Please specify the 3\' adaptor!" if($adaptor eq "");
+	if(defined $mask){
+		if($mask =~ /^~\/(.+)/){
+			$mask = $ENV{"HOME"}."/".$1;
+		}elsif($mask !~ /^\//){
+			$mask = abs_path "../".$mask;
+		}
+		symlink $mask, "mask.fa";
+		system ("bowtie-build -q mask.fa mask");
+	}
     remove_tree "Genome" if(-e "Genome");
-    make_path "Genome";
-    system ("STAR --runThreadN ".$thread." --genomeDir Genome --runMode genomeGenerate --genomeSAindexNbases 12 --genomeFastaFiles ".$prefix."/reference/".$genome."_chr_all.fasta --sjdbGTFfile ".$prefix."/reference/".$genome."_genes.gff --sjdbGTFtagExonParentTranscript Parent --sjdbGTFtagExonParentGene ID --limitGenomeGenerateRAM 64000000000");
+    make_path ("Genome", "chr");
     system ("gffread -T -C -o ".$genome.".gtf -g ".$prefix."/reference/".$genome."_chr_all.fasta ".$prefix."/reference/".$genome."_genes.gff");
-    system ("grep \"^chr[0-9]\" ".$genome.".gtf > tmp; mv tmp ".$genome.".gtf");
+    Ref->PrimaryTranscript($prefix, $genome);
+    system ("STAR --runThreadN ".$thread." --genomeDir Genome --runMode genomeGenerate --genomeSAindexNbases 12 --genomeFastaFiles ".$prefix."/reference/".$genome."_chr_all.fasta --sjdbGTFfile ".$genome.".PrimaryTranscript.gtf --limitGenomeGenerateRAM 64000000000");
     for(my $i=0;$i<=$#tags;$i++){
       my $tag = $tags[$i];
       my $file = $files[$i];
@@ -69,18 +82,27 @@ sub run {
         system ("cutadapt -j ".$thread." -m 18 --discard-untrimmed --trim-n -a ".$adaptor." -o ".$tag."_trimmed.fastq ".$tag.".fastq 2>&1");
         rename $tag."_trimmed.fastq", $tag.".fastq";
       }
+      if(defined $mask){
+        system ("bowtie -v 2 -a --un tmp.fastq -p ".$thread." -t -x mask ".$tag.".fastq ".$tag.".mask.out 2>&1");
+        rename "tmp.fastq", $tag.".fastq";
+        unlink $tag.".mask.out";
+      }
       print $main::tee "\nStart mapping...\n";
       system ("STAR --genomeDir Genome --alignIntronMax 5000 --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --quantMode TranscriptomeSAM --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag.".fastq 2>&1");
       cat 'Log.final.out', \*STDOUT;
       system ("samtools view -h -F 0x100 Aligned.toTranscriptome.out.bam |samtools sort -o ".$tag.".bam -");
       system ("samtools index ".$tag.".bam");
-      system ("samtools index Aligned.sortedByCoord.out.bam");
-      system ("bamCoverage -b Aligned.sortedByCoord.out.bam -bs 5 -p ".$thread." --filterRNAstrand forward --normalizeUsing RPKM -o ".$tag.".bw");
-      unlink $tag.".fastq";
+      system ("samtools view -q 10 -b Aligned.sortedByCoord.out.bam > ".$tag.".chr.sam");
+      system ("samtools index ".$tag.".chr.bam");
+      system ("bamCoverage -b ".$tag.".chr.bam --skipNAs -bs 5 -p ".$thread." --normalizeUsing CPM -o ".$tag.".bw");
+      unlink ($tag.".fastq", "tmp.sam");
+      mv $tag.".chr.bam", "chr";
+      mv $tag.".chr.bam.bai", "chr";
+      mv $tag.".bw", "chr";
     }
-    unlink ("Aligned.sortedByCoord.out.bam", "Aligned.sortedByCoord.out.bam.bai", "Aligned.toTranscriptome.out.bam", glob ("Log.*"), "SJ.out.tab");
+    unlink ("Aligned.toTranscriptome.out.bam", "Aligned.sortedByCoord.out.bam", glob ("Log.*"), "SJ.out.tab", $genome.".gtf");
+    unlink ("mask.fa", glob ("mask*ebwt")) if(-e "mask.fa");
     system ("Rscript --vanilla ".$prefix."/scripts/ribo.R ".$genome." ".$par) if(!$mappingonly);
-    unlink ($genome.".gtf");
     remove_tree "Genome";
   }else{
     foreach my $pre (@tags){
@@ -88,6 +110,7 @@ sub run {
     }
     Ref->geneinfo($prefix, $genome);
     rename "transcripts.fa", $genome.".fa";
+    Ref->PrimaryTranscript($prefix, $genome);
     system ("gffread -T -C -o ".$genome.".gtf -g ".$prefix."/reference/".$genome."_chr_all.fasta ".$prefix."/reference/".$genome."_genes.gff");
     system ("Rscript --vanilla ".$prefix."/scripts/ribo.R ".$genome." ".$par);
     unlink ($genome.".gtf", glob ("*.bam"), $genome.".fa");

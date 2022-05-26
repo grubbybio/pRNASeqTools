@@ -3,11 +3,11 @@ options(warn=-1)
 args = commandArgs(trailingOnly = T)
 genome <- args[1]
 tags <- args[-1]
-ann <- create_annotation(gtfpath = paste(genome,'gtf',sep="."))
+ann <- create_annotation(gtfpath = paste(genome,'PrimaryTranscript','gtf',sep="."))
 reads_list <- bamtolist(bamfolder = '.', annotation = ann)
 psite_offset <- psite(reads_list, flanking = 6, extremity = "auto")
 reads_psite_list <- psite_info(reads_list, psite_offset)
-#coverage_dt <- codon_coverage(reads_psite_list, ann, psite = FALSE)
+coverage_dt <- codon_coverage(reads_psite_list, ann, psite = FALSE)
 #psite_cds <- psite_per_cds(reads_psite_list, ann)
 
 for(i in 1:length(tags)){
@@ -24,7 +24,7 @@ for(i in 1:length(tags)){
   print(psite_region[["plot"]])
   print(frames_stratified[["plot"]])
   print(frames[["plot"]])
-  for (j in 18:75){
+  for (j in 27:30){
     try({
       metaprofile <- metaprofile_psite(reads_psite_list, ann, sample = tags[i], utr5l = 20, cdsl = 40, utr3l = 20, plot_title = "sample.transcript.length_range", length_range = j)
       print(metaprofile[[paste("plot",tags[i],sep = "_")]])

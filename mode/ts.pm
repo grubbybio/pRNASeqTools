@@ -114,8 +114,7 @@ sub run {
 			rename "Aligned.sortedByCoord.out.bam", $tag.".bam";
       cat 'Log.final.out', \*STDOUT;
       system ("samtools index ".$tag.".bam");
-      system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --ignoreDuplicates --filterRNAstrand forward --normalizeUsing RPKM -o ".$tag.".forward.bw");
-      system ("bamCoverage -b ".$tag.".bam -bs 5 -p ".$thread." --ignoreDuplicates --filterRNAstrand reverse --normalizeUsing RPKM -o ".$tag.".reverse.bw");
+      system ("bamCoverage -b ".$tag.".bam --skipNAs -bs 5 -p ".$thread." --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
 
       print $main::tee "\nFinding peaks...\n";
 

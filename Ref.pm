@@ -174,7 +174,7 @@ sub splitgff {
 }
 
 sub ann {
-  my ($self, $prefix, $genome, $binsize) = @_;
+  my ($self, $prefix, $genome, $binsize, $promoterLength) = @_;
   my %ann;
   if(-e $prefix."/reference/".$genome.".".$binsize.".annotation"){
   	open ANN, $prefix."/reference/".$genome.".".$binsize.".annotation" or die $!;
@@ -186,7 +186,7 @@ sub ann {
   		}
   	close ANN;
   }else{
-    Ref->splitgff($prefix, $genome);
+    Ref->splitgff($prefix, $genome, $promoterLength);
     open GENE, "gene.gff" or die $!;
     open TE, "te.gff" or die $!;
     open PRO, "promoter.gff" or die $!;
@@ -289,5 +289,33 @@ sub gann {
   }
   return %gann;
 }
+
+sub PrimaryTranscript {
+	my ($self, $prefix, $genome) = @_;
+	system ("python ".$prefix."/scripts/getPrimaryTranscript.py ".$prefix."/reference/".$genome."_genes.gff > ".$genome.".PrimaryTranscript.txt");
+	my (%primaryTranscript, $gene, $transcript, $exon);
+	open PT, $genome.".PrimaryTranscript.txt" or die $!;
+	while (my $aa = <PT>){
+		chomp $aa;
+		my @row = split /\t/, $aa;
+		$primaryTranscript{$row[1]} = "";
+	}
+	close PT;
+	open GTF, "<".$genome.".gtf" or die $!;
+	open OUT, ">".$genome.".PrimaryTranscript.gtf" or die $!;
+	while (my $bb = <GTF>){
+		chomp $bb;
+		my @row = split /\t/, $bb;
+		if($row[8] =~ /transcript_id "(\w+\.\d+)"/){
+			$transcript = $1; 
+			print OUT "$bb\n" if(exists $primaryTranscript{$transcript});
+		}
+	}
+	close GTF;
+	close OUT;
+	unlink $genome.".PrimaryTranscript.txt";
+}
+
 1;
+
 __END__

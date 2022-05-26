@@ -227,7 +227,7 @@ sub run {
     unlink glob ("mask*") if(defined $mask);
     if(!$mappingonly && $#par > 1){
       foreach my $mnorm (@norms){
-        mode::srna->sta($mnorm, $prefix, $genome, $foldchange, $pvalue, $binsize, $par);
+        mode::srna->sta($mnorm, $prefix, $genome, $foldchange, $pvalue, $binsize, $promoterLength, $par);
       }
     }
   }else{
@@ -241,7 +241,7 @@ sub run {
       closedir $originalFolder;
     }
     foreach my $mnorm (@norms){
-      mode::srna->sta($mnorm, $prefix, $genome, $foldchange, $pvalue, $binsize, $par);
+      mode::srna->sta($mnorm, $prefix, $genome, $foldchange, $pvalue, $binsize, $promoterLength, $par);
     }
     unlink glob ("*.count"), glob ("*.nf");
   }
@@ -250,7 +250,7 @@ sub run {
 
 
 sub sta {
-  my ($self, $mnorm, $prefix, $genome, $foldchange, $pvalue, $binsize, $par) = @_;
+  my ($self, $mnorm, $prefix, $genome, $foldchange, $pvalue, $binsize, $promoterLength, $par) = @_;
 
 	print $main::tee "\nDSR analysis...\nNormalization $mnorm\tFold Change $foldchange\tP Value $pvalue\n";
 	system ("Rscript --vanilla ".$prefix."/scripts/DSR.R ".$mnorm." ".$pvalue." ".$foldchange." ".$par);
@@ -280,7 +280,7 @@ sub sta {
     unlink $bg;
   }
 
-  my %ann = Ref->ann($prefix, $genome, $binsize);
+  my %ann = Ref->ann($prefix, $genome, $binsize, $promoterLength);
 	foreach my $csv (@dird){
 		open CSV, "$csv" or die $!;
 		open TMP, ">tmp4" or die $!;
