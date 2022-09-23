@@ -93,13 +93,13 @@ sub run {
       rename "Aligned.sortedByCoord.out.bam", $tag.".bam";
       cat 'Log.final.out', \*STDOUT;
       system ("samtools index ".$tag.".bam");
-      system ("bamCoverage -b ".$tag.".bam --skipNAs -bs 5 -p ".$thread." --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
+      system ("bamCoverage -b ".$tag.".bam --skipNAs -bs 5 -p ".$thread." --minMappingQuality 10 --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
 
       system ("STAR --genomeDir Genome2 --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag.".fastq 2>&1");
       rename "Aligned.sortedByCoord.out.bam", $tag."genomic.bam";
       cat 'Log.final.out', \*STDOUT;
       system ("samtools index ".$tag."genomic.bam");
-      system ("bamCoverage -b ".$tag."genomic.bam --skipNAs -bs 5 -p ".$thread." --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".genomic.bw");
+      system ("bamCoverage -b ".$tag."genomic.bam --skipNAs -bs 5 -p ".$thread." --minMappingQuality 10 --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".genomic.bw");
 
       print $main::tee "\nAlignment Completed!\n";
 

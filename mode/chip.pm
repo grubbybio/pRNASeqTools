@@ -138,7 +138,7 @@ sub run {
       system ("samtools markdup -r ".$tag.".sorted.bam ".$tag.".sorted.dedup.bam");
       system ("samtools index ".$tag.".sorted.dedup.bam");
       unlink $tag.".bam", $tag.".fixmate.bam", $tag.".sorted.bam";
-      system ("bamCoverage -b ".$tag.".sorted.dedup.bam --skipNAs -bs 5 -p ".$thread." --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
+      system ("bamCoverage -b ".$tag.".sorted.dedup.bam --skipNAs -bs 5 -p ".$thread." --ignoreDuplicates --minMappingQuality 10 --normalizeUsing CPM -o ".$tag.".bw");
   		print $main::tee "\nMapping completed!\n";
       system ("Genrich -r -v -g 200 -p 0.001 -t ".$tag.".sorted.name.bam -o ".$tag.".narrowPeak.txt");
     }

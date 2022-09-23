@@ -111,7 +111,7 @@ sub run {
 			rename "Aligned.sortedByCoord.out.bam", $tag.".bam";
       cat 'Log.final.out', \*STDOUT;
       system ("samtools index ".$tag.".bam");
-      system ("bamCoverage -b ".$tag.".bam --skipNAs -bs 5 -p ".$thread." --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
+      system ("bamCoverage -b ".$tag.".bam --skipNAs -bs 5 -p ".$thread." --minMappingQuality 10 --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
 
       print $main::tee "\nAlignment completed!\nFinding peaks...\n";
 

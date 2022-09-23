@@ -94,7 +94,7 @@ sub run {
       system ("samtools index ".$tag.".bam");
       system ("samtools view -q 10 -b Aligned.sortedByCoord.out.bam > ".$tag.".chr.sam");
       system ("samtools index ".$tag.".chr.bam");
-      system ("bamCoverage -b ".$tag.".chr.bam --skipNAs -bs 5 -p ".$thread." --normalizeUsing CPM -o ".$tag.".bw");
+      system ("bamCoverage -b ".$tag.".chr.bam --skipNAs -bs 5 --minMappingQuality 10 -p ".$thread." --normalizeUsing CPM -o ".$tag.".bw");
       unlink ($tag.".fastq", "tmp.sam");
       mv $tag.".chr.bam", "chr";
       mv $tag.".chr.bam.bai", "chr";

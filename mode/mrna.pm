@@ -259,7 +259,7 @@ sub countBAM {
 	my ($self, $tag, $thread, $seqStrategy, $prefix, $genome) = @_;
 
 	system ("samtools index ".$tag.".bam");
-	system ("bamCoverage -b ".$tag.".bam --skipNAs -bs 5 -p ".$thread." --normalizeUsing CPM -o ".$tag.".bw");
+	system ("bamCoverage -b ".$tag.".bam --skipNAs -bs 5 -p ".$thread." --minMappingQuality 10 --normalizeUsing CPM -o ".$tag.".bw");
 
 	print $main::tee "\nStart counting...\n";
 
