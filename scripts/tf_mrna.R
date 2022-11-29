@@ -18,7 +18,7 @@ suppressMessages(library(NMF))
 library(RColorBrewer)
 library(pheatmap)
 nmf.options(grid.patch=TRUE)
-message("Samples OK! loading...")
+message("Parameters OK! loading...")
 
 p <- sum(as.numeric(genotype1_reps)+as.numeric(genotype2_reps))
 data.frame(rep("x",p), stringsAsFactors = FALSE) -> b

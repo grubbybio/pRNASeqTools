@@ -13,7 +13,7 @@ use input;
 
 command_short_description q[Analysis for two-factor DE];
 command_long_description q[Analysis for two-factor DE identification following modes "mrna" and "srna"];
-command_usage q[pRNASeqTools tf [OPTIONS] --control [CONTROL]=[DESIGN1];[N1];[DESIGN2];[N2]... --treatment [TREATMENT]=[DESIGN1];[N1];[DESIGN2];[N2]...];
+command_usage q[pRNASeqTools tf [OPTIONS] --control [CONTROL]=[DESIGN1],[N1],[DESIGN2],[N2]... --treatment [TREATMENT]=[DESIGN1],[N1],[DESIGN2],[N2]...];
 
 option 'foldchange' => (
   is => 'rw',
@@ -69,7 +69,7 @@ sub run {
   my $deseq2norm = $options{'DESeq2Norm'};
 
   print $main::tee "Two-factor comparison between ".$control." and ".$treatment."\nFold change = ".$foldchange." P value = ".$pvalue."\n";
-  
+
   my ($tag, $rep, @tags);
   my $n = 0;
   my ($control_genotype) = keys %$control;

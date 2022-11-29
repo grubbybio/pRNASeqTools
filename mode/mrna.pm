@@ -268,7 +268,7 @@ sub countBAM {
 	if($seqStrategy eq "single"){
 		system ("featureCounts -T ".$thread." -O -G ".$prefix."/reference/".$genome."_chr_all.fasta -s 0 -a ".$genome."_genes.gtf -o total.count ".$tag.".bam 2>&1");
 	}elsif($seqStrategy eq "paired"){
-		system ("featureCounts -T ".$thread." -p --countReadPairs -B -C -O -G ".$prefix."/reference/".$genome."_chr_all.fasta -s 0 -a ".$genome."_genes.gtf -o total.count ".$tag.".bam 2>&1");
+		system ("featureCounts -T ".$thread." -p --countReadPairs -BCO -G ".$prefix."/reference/".$genome."_chr_all.fasta -s 0 -a ".$genome."_genes.gtf -o total.count ".$tag.".bam 2>&1");
 	}
 	open COUNT, "<total.count" or die $!;
 	my $header = <COUNT>;

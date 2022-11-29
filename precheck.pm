@@ -45,7 +45,7 @@ sub dependencies {
   }else{
   	die "Please install bowtie!\n";
   }
-  if($bowtie2 =~ /bowtie2-(\d\.\d\.\d)/){
+  if($bowtie2 =~ /version (\d\.\d\.\d)/){
     print STDERR "bowtie2 version $1\n";
   }else{
   	die "Please install bowtie2!\n";
