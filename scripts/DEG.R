@@ -4,8 +4,11 @@ norm = args[1]
 pvalueoo <- as.numeric(args[2])
 fdroo <- as.numeric(args[3])
 foldchangeoo <- as.numeric(args[4])
-read.table(paste(args[5],"/reference/",args[6],".BIN",sep=""), as.is = T, sep="\t") -> binref
-as.matrix(table(binref[,2])) -> refbin
+try(
+  {read.table(paste(args[5],"/reference/",args[6],".BIN",sep=""), as.is = T, sep="\t") -> binref
+  as.matrix(table(binref[,2])) -> refbin},
+  silent=TRUE
+)
 args[-c(1:6)] -> args
 args[c(TRUE, FALSE)] -> genotype
 args[c(FALSE, TRUE)] -> replicates
@@ -72,37 +75,40 @@ for(j in 2:length(genotype)){
   write.csv(out,paste(genotype[j],"vs",genotype[1],"total","csv",sep="."),quote=F)
   write.csv(resup,paste(genotype[j],"vs",genotype[1],"total","upregulated","csv",sep="."),quote=F)
   write.csv(resdown,paste(genotype[j],"vs",genotype[1],"total","downregulated","csv",sep="."),quote=F)
-  binref[binref[,1] %in% rownames(res),2] -> tmp1
-  as.matrix(table(tmp1)) -> tmp1
-  binref[binref[,1] %in% rownames(resup),2] -> tmp2
-  as.matrix(table(tmp2)) -> tmp2
-  binref[binref[,1] %in% rownames(resdown),2] -> tmp3
-  as.matrix(table(tmp3)) -> tmp3
-  merge(x=refbin, y=tmp1, all = T, by = 0) -> tmp
-  rownames(tmp) <- tmp[,1]
-  tmp[,-1] -> tmp
-  merge(x=tmp, y=tmp2, all = T, by = 0) -> tmp
-  rownames(tmp) <- tmp[,1]
-  tmp[,-1] -> tmp
-  merge(x=tmp, y=tmp3, all = T, by = 0) -> tmp
-  rownames(tmp) <- tmp[,1]
-  tmp[,-1] -> tmp
-  sum(tmp[!is.na(tmp[,2]),2]) -> sumref
-  sum(tmp[!is.na(tmp[,3]),3]) -> sumup
-  sum(tmp[!is.na(tmp[,4]),4]) -> sumdown
-  tmp[,3:4] -> tmp[,5:6]
-  for(k in 1:nrow(tmp)){
-    if(!is.na(tmp[k,3])){
-      matrix(c(tmp[k,2],sumref-tmp[k,2],tmp[k,3],sumup-tmp[k,3]),nrow=2) -> fis
-      fisher.test(fis)$p.value -> tmp[k,5]
-    }
-    if(!is.na(tmp[k,4])){
-      matrix(c(tmp[k,2],sumref-tmp[k,2],tmp[k,4],sumdown-tmp[k,4]),nrow=2) -> fis
-      fisher.test(fis)$p.value -> tmp[k,6]
-    }
-  }
-  p.adjust(tmp[,5],"fdr") -> tmp[,7]
-  p.adjust(tmp[,6],"fdr") -> tmp[,8]
-  colnames(tmp) <- c("GENOME","DETECTED","UP","DOWN","UP P","DOWN P","UP FDR","DOWN FDR")
-  write.table(tmp,paste(genotype[j],"vs",genotype[1],"total","bin","txt",sep="."),quote=F,sep="\t")
+  try(
+    {binref[binref[,1] %in% rownames(res),2] -> tmp1
+      as.matrix(table(tmp1)) -> tmp1
+      binref[binref[,1] %in% rownames(resup),2] -> tmp2
+      as.matrix(table(tmp2)) -> tmp2
+      binref[binref[,1] %in% rownames(resdown),2] -> tmp3
+      as.matrix(table(tmp3)) -> tmp3
+      merge(x=refbin, y=tmp1, all = T, by = 0) -> tmp
+      rownames(tmp) <- tmp[,1]
+      tmp[,-1] -> tmp
+      merge(x=tmp, y=tmp2, all = T, by = 0) -> tmp
+      rownames(tmp) <- tmp[,1]
+      tmp[,-1] -> tmp
+      merge(x=tmp, y=tmp3, all = T, by = 0) -> tmp
+      rownames(tmp) <- tmp[,1]
+      tmp[,-1] -> tmp
+      sum(tmp[!is.na(tmp[,2]),2]) -> sumref
+      sum(tmp[!is.na(tmp[,3]),3]) -> sumup
+      sum(tmp[!is.na(tmp[,4]),4]) -> sumdown
+      tmp[,3:4] -> tmp[,5:6]
+      for(k in 1:nrow(tmp)){
+        if(!is.na(tmp[k,3])){
+          matrix(c(tmp[k,2],sumref-tmp[k,2],tmp[k,3],sumup-tmp[k,3]),nrow=2) -> fis
+          fisher.test(fis)$p.value -> tmp[k,5]
+        }
+        if(!is.na(tmp[k,4])){
+          matrix(c(tmp[k,2],sumref-tmp[k,2],tmp[k,4],sumdown-tmp[k,4]),nrow=2) -> fis
+          fisher.test(fis)$p.value -> tmp[k,6]
+        }
+      }
+      p.adjust(tmp[,5],"fdr") -> tmp[,7]
+      p.adjust(tmp[,6],"fdr") -> tmp[,8]
+      colnames(tmp) <- c("GENOME","DETECTED","UP","DOWN","UP P","DOWN P","UP FDR","DOWN FDR")
+      write.table(tmp,paste(genotype[j],"vs",genotype[1],"total","bin","txt",sep="."),quote=F,sep="\t")},
+    silent = TRUE
+  )
 }

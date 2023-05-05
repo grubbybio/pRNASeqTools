@@ -18,6 +18,8 @@ sub run {
       $options{'adaptor'} = "AGATCGGAAGAGC";
     }elsif($options{'adaptor'} eq "2"){
       $options{'adaptor'} = "TGGAATTCTCGGG";
+    }elsif($options{'adaptor'} eq "3"){
+      $options{'adaptor'} = "CTGTCTCTTATA";
     }
   }
   if(defined $options{'adaptor2'}){
@@ -25,6 +27,8 @@ sub run {
       $options{'adaptor2'} = "AGATCGGAAGAGC";
     }elsif($options{'adaptor2'} eq "2"){
       $options{'adaptor2'} = "TGGAATTCTCGGG";
+    }elsif($options{'adaptor'} eq "3"){
+      $options{'adaptor'} = "CTGTCTCTTATA";
     }
   }
   die 'Please use appropriate threads!' if(defined $options{'thread'} and $options{'thread'} =~ /[^1-9]/);

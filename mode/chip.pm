@@ -54,6 +54,12 @@ option 'treatment' => (
   required => 1,
   documentation => q[seq files seperated by plus for IP],
 );
+option 'seqStrategy' => (
+  is => 'rw',
+  isa => 'Str',
+  default => 'paired',
+  documentation => q[Sequencing stragety. Allowed value: paired, single],
+)
 
 sub run {
   my ($self) = @_;
@@ -70,6 +76,7 @@ sub run {
   my $mappingonly = $options{'mapping-only'};
   my $input = $options{'control'};
   my $ip = $options{'treatment'};
+  my $mode = $options{'seqStrategy'};
 
   my (@tags, @files);
   my ($input_ref, $inputf_ref, $inputp_ref, $ip_ref, $ipf_ref, $ipp_ref);
@@ -91,7 +98,7 @@ sub run {
   if(!$nomapping){
     print $main::tee "\nBuilding index...\n";
     symlink $prefix."/reference/".$genome."_chr_all.fasta", $genome."_chr_all.fasta";
-    system ("bowtie2-build -q ".$genome."_chr_all.fasta ".$genome."_chr_all");
+    system ("bowtie2-build --threads ".$thread." -q ".$genome."_chr_all.fasta ".$genome."_chr_all");
     for(my $i=0;$i<=$#tags;$i++){
       my $tag = $tags[$i];
       my $file = $files[$i];
@@ -99,6 +106,7 @@ sub run {
   		if($file !~ /,/){
   			my @files = Function->SRR($file, $thread);
         if($#files == 0){
+          $mode = 'single';
         	Function->unzip($files[0], $tag);
         	if(defined $adaptor){
             print $main::tee "\nTrimming...\n";
@@ -144,6 +152,10 @@ sub run {
     unlink (glob ($genome."_chr_all*"), "igv.log");
     if(!$mappingonly && defined $input){
       my $command = "Genrich -r -v ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt 2>&1";
+      if($mode = 'single'){
+        print $main::tee "\nSingle-end mode is On...";
+        $command .= " -y";
+      }
       if($qvalue < 1){
         print $main::tee "\nFinding peaks...\nAUC\t$auc\tQ Value\t$qvalue\n";
         $command .= " -q $qvalue";
@@ -158,6 +170,10 @@ sub run {
       symlink "../".$pre.".sorted.name.bam", $pre.".sorted.name.bam" or die $!;
     }
     my $command = "Genrich -r -v ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt 2>&1";
+    if($mode = 'single'){
+        print $main::tee "\nSingle-end mode is On...";
+        $command .= " -y";
+    }
     if($qvalue < 1){
       print $main::tee "\nFinding peaks...\nAUC\t$auc\tQ Value\t$qvalue\n";
       $command .= " -q $qvalue";

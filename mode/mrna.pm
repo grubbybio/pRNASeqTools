@@ -57,6 +57,12 @@ option 'seqStrategy' => (
   isa => 'Str',
   documentation => q[Sequencing stragety, must specify performing bam mode. Allowed value: paired, single]
 );
+option 'genomeSize' => (
+  is => 'rw',
+  isa => 'Num',
+  default => '10',
+  documentation => q[Parameter 'genomeSAindexNbases' for STAR. Default: 10],
+);
 
 sub run {
   my ($self) = @_;
@@ -76,6 +82,7 @@ sub run {
   my $mask = $options{'mask'};
   my $total = $options{'total'};
   my $seqStrategy = $options{'seqStrategy'};
+  my $genomeSize = $options{'genomeSize'};
 
   my $mapping = 1,;
   my $count = 1;
@@ -113,7 +120,7 @@ sub run {
 
     remove_tree "Genome" if(-e "Genome");
     make_path "Genome";
-    system ("STAR --runThreadN ".$thread." --genomeDir Genome --runMode genomeGenerate --genomeSAindexNbases 12 --genomeFastaFiles ".$prefix."/reference/".$genome."_chr_all.fasta --sjdbGTFfile ".$prefix."/reference/".$genome."_genes.gff --sjdbGTFtagExonParentTranscript Parent --sjdbGTFtagExonParentGene ID --limitGenomeGenerateRAM 64000000000");
+    system ("STAR --runThreadN ".$thread." --genomeDir Genome --runMode genomeGenerate --genomeSAindexNbases ".$genomeSize." --genomeFastaFiles ".$prefix."/reference/".$genome."_chr_all.fasta --sjdbGTFfile ".$prefix."/reference/".$genome."_genes.gff --sjdbGTFtagExonParentTranscript Parent --sjdbGTFtagExonParentGene ID --limitGenomeGenerateRAM 64000000000");
     if($total){
       system ("gffread -T -o ".$genome."_genes.gtf -g ".$prefix."/reference/".$genome."_chr_all.fasta ".$prefix."/reference/".$genome."_genes.gff");
     }else{
@@ -122,7 +129,7 @@ sub run {
     for(my $i=0;$i<=$#tags;$i++){
       my $tag = $tags[$i];
       my $file = $files[$i];
-  		print $main::tee "\nMapping $tag...\n";
+  		print $main::tee "\nProcessing $tag...\n";
   		if($file !~ /,/){
         $seqStrategy = "single";
 			  my @files = Function->SRR($file, $thread);
@@ -173,6 +180,7 @@ sub run {
           rename "tmp_2.fastq", $tag."_R2.fastq";
           unlink $tag.".mask.out";
         }
+        print $main::tee "\nMapping...\n";
         system ("STAR --runMode alignReads --genomeDir Genome --alignIntronMax 5000 --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag."_R1.fastq ".$tag."_R2.fastq 2>&1");
   			unlink ($tag."_R1.fastq", $tag."_R2.fastq");
   		}
