@@ -1,4 +1,5 @@
 message("\nChecking R packages...")
+options(repos=structure(c(CRAN="https://cloud.r-project.org")))
 
 if(!requireNamespace("BiocManager", quietly = TRUE)){
   install.packages("BiocManager")
