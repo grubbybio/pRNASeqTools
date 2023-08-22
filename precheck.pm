@@ -14,7 +14,7 @@ sub dependencies {
   my $bowtie = qx(bowtie --version);
   my $bowtie2 = qx(bowtie2 --version);
   my $featureCounts = qx(featureCounts -v 2>&1);
-  my $shortstack = qx(ShortStack -v);
+  my $shortstack = qx(ShortStack --version);
   my $bedtools = qx(bedtools --version);
   my $R = qx(R --version);
   my $star = qx(STAR --version);
@@ -55,7 +55,7 @@ sub dependencies {
   }else{
     die "Please install featureCounts!\n";
   }
-  if($shortstack =~ /version 3/){
+  if($shortstack =~ /ShortStack 4/){
   	print STDERR "$shortstack";
   }else{
   	die "Please install ShortStack!\n";

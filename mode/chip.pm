@@ -59,7 +59,7 @@ option 'seqStrategy' => (
   isa => 'Str',
   default => 'paired',
   documentation => q[Sequencing stragety. Allowed value: paired, single],
-)
+);
 
 sub run {
   my ($self) = @_;
@@ -152,7 +152,7 @@ sub run {
     unlink (glob ($genome."_chr_all*"), "igv.log");
     if(!$mappingonly && defined $input){
       my $command = "Genrich -r -v ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt 2>&1";
-      if($mode = 'single'){
+      if($mode eq 'single'){
         print $main::tee "\nSingle-end mode is On...";
         $command .= " -y";
       }
@@ -170,7 +170,7 @@ sub run {
       symlink "../".$pre.".sorted.name.bam", $pre.".sorted.name.bam" or die $!;
     }
     my $command = "Genrich -r -v ".$genrich_ip." ".$genrich_input." -o ".$ipp[0].".narrowPeak.txt 2>&1";
-    if($mode = 'single'){
+    if($mode eq 'single'){
         print $main::tee "\nSingle-end mode is On...";
         $command .= " -y";
     }
