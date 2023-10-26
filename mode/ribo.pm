@@ -57,16 +57,15 @@ sub run {
   my $par = join " ", @tags;
 
   if(!$nomapping){
-    die "Please specify the 3\' adaptor!" if($adaptor eq "");
-	if(defined $mask){
-		if($mask =~ /^~\/(.+)/){
-			$mask = $ENV{"HOME"}."/".$1;
-		}elsif($mask !~ /^\//){
-			$mask = abs_path "../".$mask;
-		}
-		symlink $mask, "mask.fa";
-		system ("bowtie-build -q mask.fa mask");
-	}
+  	if(defined $mask){
+  		if($mask =~ /^~\/(.+)/){
+  			$mask = $ENV{"HOME"}."/".$1;
+  		}elsif($mask !~ /^\//){
+  			$mask = abs_path "../".$mask;
+  		}
+  		symlink $mask, "mask.fa";
+  		system ("bowtie-build -q mask.fa mask");
+  	}
     remove_tree "Genome" if(-e "Genome");
     make_path ("Genome", "chr");
     system ("gffread -T -C -o ".$genome.".gtf -g ".$prefix."/reference/".$genome."_chr_all.fasta ".$prefix."/reference/".$genome."_genes.gff");

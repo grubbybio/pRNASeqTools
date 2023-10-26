@@ -19,7 +19,7 @@ sub run {
     }elsif($options{'adaptor'} eq "2"){
       $options{'adaptor'} = "TGGAATTCTCGGG";
     }elsif($options{'adaptor'} eq "3"){
-      $options{'adaptor'} = "CTGTCTCTTATA";
+      $options{'adaptor'} = "CTGTCTCTTATAC";
     }
   }
   if(defined $options{'adaptor2'}){

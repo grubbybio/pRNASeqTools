@@ -55,7 +55,7 @@ sub dependencies {
   }else{
     die "Please install featureCounts!\n";
   }
-  if($shortstack =~ /ShortStack 4/){
+  if($shortstack =~ /ShortStack.+[34]/){
   	print STDERR "$shortstack";
   }else{
   	die "Please install ShortStack!\n";
