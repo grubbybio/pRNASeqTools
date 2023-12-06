@@ -182,7 +182,7 @@ sub run {
       system ("bowtie -v 2 -a -p ".$thread." -t ".$prefix."/reference/lsu_rrna ".$tag.".fastq ".$tag.".rRNA.out 2>&1");
       system ("awk -F \"\t\" \'BEGIN{x=0;y=0;z=0}{if(\$2==\"+\"){if(/$genome\_LSU/){x++};if(/$genome\_SSU/){y++};if(/$genome\_U6/){z++}}}END{print \"rRNA\t\"x\"\\nSSU\t\"y\"\\nU6\t\"z}\' ".$tag.".rRNA.out > ".$tag.".nf");
 
-      system ("ShortStack --outdir ShortStack_".$tag." --align_only --bowtie_m 1000 --ranmax 50 --mmap ".$mmap." --mismatches 0 --bowtie_cores ".$thread." --nohp --readfile ".$tag.".fastq --genomefile ".$prefix."/reference/".$genome."_chr_all.fasta 2>&1");
+      system ("ShortStack --outdir ShortStack_".$tag." --align_only --mmap ".$mmap." --threads ".$thread." --nohp --readfile ".$tag.".fastq --genomefile ".$prefix."/reference/".$genome."_chr_all.fasta 2>&1");
 
       print $main::tee "\nAlignment Completed!\n";
 
