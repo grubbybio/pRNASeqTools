@@ -16,6 +16,7 @@ genotype2_tags[c(TRUE, FALSE)] -> genotype2_tags
 suppressMessages(library(DESeq2))
 suppressMessages(library(NMF))
 library(RColorBrewer)
+library(dplyr)
 library(pheatmap)
 nmf.options(grid.patch=TRUE)
 message("Parameters OK! loading...")
@@ -47,7 +48,7 @@ message("Loading completed.")
 
 eval(parse(text=rownames(b)[1]))[,1] -> a
 for(i in 2:p){
-  cbind(a,eval(parse(text=rownames(b)[i]))[,1])-> a
+  rbind.fill(a,eval(parse(text=rownames(b)[i]))[,1])-> a
 }
 rownames(b) -> colnames(a)
 rownames(a) <- rownames(eval(parse(text=rownames(b)[i])))

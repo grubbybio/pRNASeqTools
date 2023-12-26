@@ -7,6 +7,9 @@ if(!requireNamespace("BiocManager", quietly = TRUE)){
 if (!requireNamespace("devtools", quietly = TRUE)){
   install.packages("devtools")
 }
+if (!requireNamespace("dplyr", quietly = TRUE)){
+  install.packages("dplyr")
+}
 
 packages <- c("DESeq2", "pheatmap", "DMRcaller", "RNAmodR.RiboMethSeq")
 package.check <- lapply(

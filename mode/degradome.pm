@@ -35,6 +35,12 @@ option 'targets' => (
   default => 'all',
   documentation => q[Transcript list of interested targets for CRI. If not defined, all transcipts will be used],
 );
+option 'siRNAs' => (
+  is => 'rw',
+  isa => 'Str',
+  default => undef,
+  documentation => q[Extra siRNAs for target searching],
+);
 
 sub run {
   my ($self) = @_;
@@ -49,6 +55,7 @@ sub run {
   my $nomapping = $options{'no-mapping'};
   my $mappingonly = $options{'mapping-only'};
   my $targets = $options{'targets'};
+  my $sirna = $options{'siRNAs'};
 
   my ($tags_ref, $files_ref, $par_ref) = input->run($control);
   my @tags = @$tags_ref;
@@ -123,7 +130,7 @@ sub run {
 
       print $main::tee "Finding peaks...\n";
 
-      mode::degradome->Peak($thread, $prefix, $genome, \@tags);
+      mode::degradome->Peak($thread, $prefix, $genome, $sirna, \@tags);
 
       print $main::tee "Calculating CRIs...\n";
 
@@ -143,7 +150,7 @@ sub run {
 
     Ref->geneinfo($prefix, $genome);
     rename "transcripts.fa", $genome.".fa";
-    mode::degradome->Peak($thread, $prefix, $genome, \@tags);
+    mode::degradome->Peak($thread, $prefix, $genome, $sirna, \@tags);
 
     print $main::tee "Calculating CRIs...\n";
 
@@ -202,7 +209,7 @@ sub CRI {
 }
 
 sub Peak {
-	my ($self, $thread, $prefix, $genome, $tags_ref) = @_;
+	my ($self, $thread, $prefix, $genome, $sirna, $tags_ref) = @_;
   my @tags = map {$_."_lib.txt"} @$tags_ref;
   my $tags_lib = join " ", @tags;
   make_path "sparta";
@@ -225,6 +232,7 @@ sub Peak {
     print MIR ">$mirna{$miseq}{name}\n$miseq\n";
   }
   close MIR;
+  system ("cat $sirna >> ".$genome."_miRNA.fa") if(defined $sirna);
   symlink $prefix."/sPARTA.py", "sPARTA.py";
   foreach my $file (@tags){
     symlink "../".$file, $file or die $!;
