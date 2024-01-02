@@ -38,7 +38,7 @@ option 'targets' => (
 option 'siRNAs' => (
   is => 'rw',
   isa => 'Str',
-  default => undef,
+  default => '',
   documentation => q[Extra siRNAs for target searching],
 );
 
