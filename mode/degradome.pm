@@ -232,7 +232,7 @@ sub Peak {
     print MIR ">$mirna{$miseq}{name}\n$miseq\n";
   }
   close MIR;
-  system ("cat $sirna >> ".$genome."_miRNA.fa") if(defined $sirna);
+  system ("cat $sirna >> ".$genome."_miRNA.fa") if($sirna);
   symlink $prefix."/sPARTA.py", "sPARTA.py";
   foreach my $file (@tags){
     symlink "../".$file, $file or die $!;
