@@ -113,7 +113,7 @@ sub run {
     }else{
       if($reference =~ /^~\/(.+)/){
         $reference = $ENV{"HOME"}."/".$1;
-      }else{
+      }elsif($reference !~ /^\//){
         $reference = abs_path "../".$reference;
       }
       symlink $reference.".fa", "reference.fa";
