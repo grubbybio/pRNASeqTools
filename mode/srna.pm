@@ -193,12 +193,12 @@ sub run {
       }
       if(defined $spikein){
         system ("bowtie -v 0 -a -p ".$thread." -t spikein ".$tag.".fastq ".$tag.".spikein.out 2>&1");
-        system ("awk -F \"\t\" \'length(\$5)==13 \&\& \$2==\"+\"{print \$3}\' ".$tag.".spikein.out \|sort\|uniq -c\|awk \'{print \$2\"\t\"\$1}\' >".$tag.".nf");
+        system ("awk -F \"\t\" \'length(\$5)==13 \&\& \$2==\"+\"{print \$3}\' ".$tag.".spikein.out \|sort\|uniq -c\|awk \'{print \$2\"\t\"\$1}\' >".$tag.".spikein");
       }
       print $main::tee "\nStart mapping...\n";
 
       system ("bowtie -v 2 -a -p ".$thread." -t ".$prefix."/reference/lsu_rrna ".$tag.".fastq ".$tag.".rRNA.out 2>&1");
-      system ("awk -F \"\t\" \'BEGIN{x=0;y=0;z=0}{if(\$2==\"+\"){if(/$genome\_LSU/){x++};if(/$genome\_SSU/){y++};if(/$genome\_U6/){z++}}}END{print \"rRNA\t\"x\"\\nSSU\t\"y\"\\nU6\t\"z}\' ".$tag.".rRNA.out >> ".$tag.".nf");
+      system ("awk -F \"\t\" \'BEGIN{x=0;y=0;z=0}{if(\$2==\"+\"){if(/$genome\_LSU/){x++};if(/$genome\_SSU/){y++};if(/$genome\_U6/){z++}}}END{print \"rRNA\t\"x\"\\nSSU\t\"y\"\\nU6\t\"z}\' ".$tag.".rRNA.out > ".$tag.".nf");
 
       system ("ShortStack --outdir ShortStack_".$tag." --align_only --mmap ".$mmap." --threads ".$thread." --nohp --readfile ".$tag.".fastq --genomefile ".$prefix."/reference/".$genome."_chr_all.fasta 2>&1");
 
