@@ -16,7 +16,7 @@ sub gff {
     next if($row[2] =~ /UTR/ || $row[2] =~ /c_transcript/ || $row[2] =~ /region/);
     next if($row[2] eq "protein" || $row[2] eq "CDS" ||$row[2] =~ /[^i]RNA/);
     if($row[2] =~ /gene/){
-      if($row[8] =~ /^ID=(\w+);/o){
+      if($row[8] =~ /^ID=(.+);/o){
         $id = $1;
         $ind = int($row[3]/100000);
         $chr = $row[0];
@@ -128,7 +128,7 @@ sub splitgff {
     chomp $aa;
     my @row = split /\t/, $aa;
     if($row[2] =~ /gene/){
-      if($row[8] =~ /ID=(\w+);/o){
+      if($row[8] =~ /ID=(.+);/o){
         my $name = $1;
         if($row[8] =~ /Note=transposable_element_gene;/){
           $row[8] = $name."_TEG";
@@ -162,7 +162,7 @@ sub splitgff {
     chomp $bb;
     my @row = split /\t/, $bb;
     if($row[2] =~ /transposable_element/){
-      if($row[8] =~ /ID=(\w+);/o){
+      if($row[8] =~ /ID=(.+);/o){
         $row[8] = $1;
         my $row = join "\t", @row;
         print TMP "$row\n";
