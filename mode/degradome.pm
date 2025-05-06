@@ -38,7 +38,7 @@ option 'targets' => (
 option 'siRNAs' => (
   is => 'rw',
   isa => 'Str',
-  default => '',
+  default => 'none',
   documentation => q[Extra siRNAs for target searching],
 );
 
@@ -96,14 +96,14 @@ sub run {
 
       print $main::tee "\nStart mapping...\n";
 
-      system ("STAR --genomeDir Genome --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag.".fastq 2>&1");
+      system ("STAR --genomeDir Genome --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --limitOutSJcollapsed 10000000 --limitIObufferSize 280000000 --runThreadN ".$thread." --readFilesIn ".$tag.".fastq 2>&1");
       rename "Aligned.sortedByCoord.out.bam", $tag.".bam";
       cat 'Log.final.out', \*STDOUT;
       system ("samtools index ".$tag.".bam");
       system ("bamCoverage -b ".$tag.".bam --skipNAs -bs 5 -p ".$thread." --minMappingQuality 10 --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".bw");
 
-      system ("STAR --genomeDir Genome2 --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --runThreadN ".$thread." --readFilesIn ".$tag.".fastq 2>&1");
-      rename "Aligned.sortedByCoord.out.bam", $tag."genomic.bam";
+      system ("STAR --genomeDir Genome2 --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 10000000000 --outSAMmultNmax 1 --outFilterMultimapNmax 50 --outFilterMismatchNoverLmax 0.1 --limitOutSJcollapsed 10000000 --limitIObufferSize 280000000 --runThreadN ".$thread." --readFilesIn ".$tag.".fastq 2>&1");
+      rename "Aligned.sortedByCoord.out.bam", $tag.".genomic.bam";
       cat 'Log.final.out', \*STDOUT;
       system ("samtools index ".$tag.".genomic.bam");
       system ("bamCoverage -b ".$tag.".genomic.bam --skipNAs -bs 5 -p ".$thread." --minMappingQuality 10 --ignoreDuplicates --normalizeUsing CPM -o ".$tag.".genomic.bw");
@@ -232,7 +232,7 @@ sub Peak {
     print MIR ">$mirna{$miseq}{name}\n$miseq\n";
   }
   close MIR;
-  system ("cat $sirna >> ".$genome."_miRNA.fa") if($sirna);
+  system ("cat $sirna >> ".$genome."_miRNA.fa") if($sirna ne "none");
   symlink $prefix."/sPARTA.py", "sPARTA.py";
   foreach my $file (@tags){
     symlink "../".$file, $file or die $!;

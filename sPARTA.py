@@ -967,7 +967,7 @@ def fragFASTA(FASTA,fastaList):
         
         else:
             nfrags = str(nseq) ## 
-            if fragFasta == 'Y':
+            if fragFASTA == 'Y':
                 print ("--Header based fragmentation in process for '%s' file" % (FASTA))
                 # retcode = subprocess.call(["pyfasta","split", "-n", nfrags, FASTA]) - Deprecated
                 

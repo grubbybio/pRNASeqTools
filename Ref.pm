@@ -191,6 +191,7 @@ sub ann {
     open TE, "te.gff" or die $!;
     open PRO, "promoter.gff" or die $!;
     open MIR, $prefix."/reference/".$genome."_miRNA_miRNA_star.gff" or die $!;
+    open OANN, $genome.".".$binsize.".annotation";
     while (my $aa = <GENE>){
       chomp $aa;
       my @row = split /\t/, $aa;
@@ -237,9 +238,11 @@ sub ann {
     close PRO;
     unlink ("gene.gff", "te.gff", "promoter.gff");
 
-    foreach my $id (keys %ann){
+    foreach my $id (sort {$a <=> $b} keys %ann){
       chop $ann{$id};
+      print OANN "$id\t$ann{$id}\n";
     }
+    close OANN;
   }
   return %ann;
 }
@@ -276,6 +279,9 @@ sub gann {
     while(my $bb = <FUN>){
       chomp $bb;
       my @fann = split /\t/, $bb;
+      for(my $j=1;$j<=4;$j++){
+        $fann[$j] = "NA" if ($fann[$j] eq "");
+      }
       if($fann[0] =~ /(\w+)\.1$/){
         my $geneID = $1;
         if(exists $gann{$geneID}){

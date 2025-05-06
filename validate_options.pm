@@ -45,7 +45,7 @@ sub run {
   die 'Please select the correct style!' if(defined $options{'style'} and $options{'style'} !~ /histone|factor|tss/);
   die 'Cannot find the target list!' if(defined $options{'targets'} and $options{'targets'} ne "all" and !-e $options{'targets'});
   die 'Please provide the library type when input files are in the bam format!' if(defined $options{'mode'} and $options{'mode'} eq '3' and !defined $options{'seqStrategy'});
-  die 'Cannot find the siRNA list in fasta file!' if(defined $options{'siRNAs'} and !-e $options{'siRNAs'});
+  die 'Cannot find the siRNA list in fasta format!' if(defined $options{'siRNAs'} and $options{'siRNAs'} ne "none" and !-e $options{'siRNAs'});
   return %options;
 }
 
