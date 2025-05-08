@@ -128,7 +128,7 @@ sub splitgff {
     chomp $aa;
     my @row = split /\t/, $aa;
     if($row[2] =~ /gene/){
-      if($row[8] =~ /ID=(.+);/o){
+      if($row[8] =~ /ID=([A-Za-z0-9_.]+);/o){
         my $name = $1;
         if($row[8] =~ /Note=transposable_element_gene;/){
           $row[8] = $name."_TEG";
@@ -162,7 +162,7 @@ sub splitgff {
     chomp $bb;
     my @row = split /\t/, $bb;
     if($row[2] =~ /transposable_element/){
-      if($row[8] =~ /ID=(.+);/o){
+      if($row[8] =~ /ID=([A-Za-z0-9_.]+);/o){
         $row[8] = $1;
         my $row = join "\t", @row;
         print TMP "$row\n";
@@ -191,7 +191,7 @@ sub ann {
     open TE, "te.gff" or die $!;
     open PRO, "promoter.gff" or die $!;
     open MIR, $prefix."/reference/".$genome."_miRNA_miRNA_star.gff" or die $!;
-    open OANN, $genome.".".$binsize.".annotation";
+    open OANN, ">".$genome.".".$binsize.".annotation";
     while (my $aa = <GENE>){
       chomp $aa;
       my @row = split /\t/, $aa;
@@ -238,7 +238,7 @@ sub ann {
     close PRO;
     unlink ("gene.gff", "te.gff", "promoter.gff");
 
-    foreach my $id (sort {$a <=> $b} keys %ann){
+    foreach my $id (sort keys %ann){
       chop $ann{$id};
       print OANN "$id\t$ann{$id}\n";
     }
